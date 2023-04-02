@@ -1,0 +1,11 @@
+pythonjsonlogger
+pydantic
+uvicorn
+fastapi
+python-dotenv
+
+torch
+bitsandbytes
+sentencepiece
+git+https://github.com/huggingface/transformers.git
+git+https://github.com/huggingface/peft.git
