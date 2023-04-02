@@ -1,6 +1,11 @@
 import torch
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
+if torch.cuda.is_available():
+    device = "cuda"
+else:
+    device = "cpu"
+
 PROMPT_DICT = {
     "prompt_input": (
         "Below is an instruction that describes a task, paired with an input that provides further context.\n"
@@ -22,13 +27,21 @@ def setup_model(model_name: str, cache_dir: str = None):
         model_name,
         cache_dir=cache_dir
     )
-    model = LlamaForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16,
-        load_in_8bit=True,
-        device_map='auto',
-        cache_dir=cache_dir,
-    )
+    if device == "cuda":
+        model = LlamaForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=torch.float16,
+            load_in_8bit=True,
+            device_map='auto',
+            cache_dir=cache_dir,
+        )
+    else:
+        model = LlamaForCausalLM.from_pretrained(
+            model_name, device_map={"": device},
+            low_cpu_mem_usage=True,
+            cache_dir=cache_dir,
+        )
+    model.eval()
     return tokenizer, model
 
 
@@ -66,6 +79,6 @@ if __name__ == '__main__':
     model_name = os.environ['MODEL_NAME']
     tokenizer, model = setup_model(model_name, cache_dir)
 
-    prompt = "Python으로 uptime을 찾는 코드"
+    prompt = "입력받은 숫자가 prime number 인지 검사하는 python 코드"
     generation = generate(tokenizer, model, prompt)
     print(generation)
