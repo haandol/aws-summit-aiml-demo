@@ -58,8 +58,12 @@ def generate(
 
 
 if __name__ == '__main__':
-    cache_dir='/home/ec2-user/SageMaker/.cache'
-    model_name = 'beomi/KoAlpaca'
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    cache_dir = os.environ['CACHE_DIR']
+    model_name = os.environ['MODEL_NAME']
     tokenizer, model = setup_model(model_name, cache_dir)
 
     prompt = "Python으로 uptime을 찾는 코드"

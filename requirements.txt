@@ -1,4 +1,4 @@
-pythonjsonlogger
+python-json-logger
 pydantic
 uvicorn
 fastapi
