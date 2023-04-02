@@ -5,6 +5,7 @@ fastapi
 python-dotenv
 
 torch
+accelerate
 bitsandbytes
 sentencepiece
 git+https://github.com/huggingface/transformers.git
