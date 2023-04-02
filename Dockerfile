@@ -1,5 +1,6 @@
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 
+ARG CACHE_DIR=/home/ec2-user/SageMaker/.cache
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -19,7 +20,7 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
 
 COPY lib /app/
 COPY main.py /app/
-COPY hf_cache /app/.cache
+COPY ${CACHE_DIR}/models--beomi--KoAlpaca /app/.cache/models--beomi--KoAlpaca
 COPY env/dev.env /app/.env
 
 EXPOSE 8080
