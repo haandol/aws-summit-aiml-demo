@@ -1,5 +1,7 @@
 # KoAlpacaDocker
 
+model weight file will be placed at EFS
+
 # Build
 
 ## Setup environment
@@ -19,5 +21,5 @@ python3 -m lib.chatbot
 ## Build Docker Image
 
 ```bash
-docker build -t koalpaca --build-arg CACHE_DIR=.cache .
+docker build -t koalpaca .
 ```

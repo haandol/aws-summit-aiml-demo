@@ -1,0 +1,14 @@
+version: '3'
+services:
+  koalpaca:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: koalpaca
+    restart: always
+    ports:
+      - 8080:8080
+    volumes:
+      - ./.cache:/app/.cache
