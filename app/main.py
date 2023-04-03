@@ -40,6 +40,13 @@ async def startup_event():
     logger.info('Model loaded')
 
 
+@api.get('/healthz')
+async def healthz():
+    return {
+        'status': 'ok',
+    }
+
+
 @api.post('/v1/chat')
 async def chat(message: Message):
     logger.info(message)
