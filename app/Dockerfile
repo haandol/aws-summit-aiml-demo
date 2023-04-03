@@ -1,4 +1,5 @@
 FROM --platform=linux/amd64 nvidia/cuda:11.8.0-devel-ubuntu22.04
+LABEL maintainer="ldg55d@gmail.com"
 
 ARG DEBIAN_FRONTEND=noninteractive
 

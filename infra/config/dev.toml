@@ -1,0 +1,19 @@
+[app]
+ns="ChatbotDemo"
+stage="Dev"
+
+[aws]
+account="" # e.g. 123456789012
+region="ap-northeast-2"
+
+[vpc]
+id="" # e.g. vpc-xxx
+
+[service]
+[service.common]
+port=8080
+tag="a5365aa62b"
+
+[service.chatbot]
+name="chatbot"
+repositoryName="chatbot"
