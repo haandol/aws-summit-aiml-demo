@@ -15,6 +15,9 @@ class Message(BaseModel):
         default=None, title='context texts',
     )
     prompt: str
+    temperature: float = Field(
+        default=0.1, title='temperature',
+    )
     
 
 model = None
@@ -41,7 +44,8 @@ async def chat(message: Message):
         tokenizer=tokenizer,
         model=model,
         prompt=message.prompt,
-        context=message.context
+        context=message.context,
+        temperature=message.temperature,
     )
     return {
         'generation': generation,

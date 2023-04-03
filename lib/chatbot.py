@@ -1,5 +1,5 @@
 import torch
-from transformers import LlamaForCausalLM, LlamaTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 if torch.cuda.is_available():
     device = "cuda"
@@ -23,12 +23,12 @@ PROMPT_DICT = {
 
 
 def setup_model(model_name: str, cache_dir: str = None):
-    tokenizer = LlamaTokenizer.from_pretrained(
+    tokenizer = AutoTokenizer.from_pretrained(
         model_name,
         cache_dir=cache_dir
     )
     if device == "cuda":
-        model = LlamaForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
             load_in_8bit=True,
@@ -36,7 +36,7 @@ def setup_model(model_name: str, cache_dir: str = None):
             cache_dir=cache_dir,
         )
     else:
-        model = LlamaForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_name, device_map={"": device},
             low_cpu_mem_usage=True,
             cache_dir=cache_dir,
@@ -46,27 +46,32 @@ def setup_model(model_name: str, cache_dir: str = None):
 
 
 def generate(
-    tokenizer: LlamaTokenizer,
-    model: LlamaForCausalLM,
+    tokenizer: AutoTokenizer,
+    model: AutoModelForCausalLM,
     prompt: str,
     context: str = None,
+    top_p: float = 0.8,
+    top_k: int = 40,
     max_new_tokens: int = 128,
-    temperature: float = 0.5
+    temperature: float = 0.1,
 ):
     if context:
         x = PROMPT_DICT['prompt_input'].format(instruction=prompt, context=context)
     else:
         x = PROMPT_DICT['prompt_no_input'].format(instruction=prompt)
-    
+
     input_ids = tokenizer.encode(x, return_tensors="pt").to(model.device)
-    gen_tokens = model.generate(
-        input_ids, 
-        max_new_tokens=max_new_tokens, 
-        num_return_sequences=1, 
-        temperature=temperature,
-        no_repeat_ngram_size=6,
-        do_sample=True,
-    )
+    with torch.no_grad():
+        gen_tokens = model.generate(
+            input_ids=input_ids,
+            max_new_tokens=max_new_tokens, 
+            num_return_sequences=1,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            no_repeat_ngram_size=6,
+            pad_token_id=tokenizer.eos_token_id,
+        )
     return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(x):]
 
 
