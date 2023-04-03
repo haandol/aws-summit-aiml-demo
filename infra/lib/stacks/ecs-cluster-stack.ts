@@ -41,8 +41,8 @@ export class EcsClusterStack extends Stack {
 
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.G5,
-        ec2.InstanceSize.XLARGE
+        ec2.InstanceClass.P3,
+        ec2.InstanceSize.XLARGE2
       ),
       blockDevices: [
         {
