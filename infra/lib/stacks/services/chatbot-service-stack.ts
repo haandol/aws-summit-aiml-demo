@@ -19,9 +19,9 @@ export class ChatbotServiceStack extends Stack {
     super(scope, id, props);
 
     const taskEnvs = {
-      OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvOtelExporterEndpoint', {
-          stringValue: '127.0.0.1:4317',
+      CACHE_DIR: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvCacheDir', {
+          stringValue: '/app/huggingface/.cache',
         })
       ),
     };
