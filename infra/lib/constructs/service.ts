@@ -85,6 +85,7 @@ export class CommonService extends Construct {
         serviceRepository,
         props.service.tag
       ),
+      gpuCount: 1,
       logging,
       healthCheck: {
         command: [
@@ -108,7 +109,7 @@ export class CommonService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 0,
+      desiredCount: 1,
       minHealthyPercent: 0,
       maxHealthyPercent: 100,
       cloudMapOptions: {
