@@ -1,12 +1,13 @@
 version: '3'
 services:
-  koalpaca:
+  polyglot:
     env_file:
       - .env
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: koalpaca
+      platforms:
+        - linux/amd64
     restart: always
     ports:
       - 8080:8080
