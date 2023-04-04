@@ -49,7 +49,7 @@ async def healthz():
     }
 
 
-@api.post('/v1/chat')
+@api.post('/v1/chat/')
 async def chat(message: Message):
     logger.info(message)
     try:
