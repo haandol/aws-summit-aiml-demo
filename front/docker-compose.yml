@@ -1,0 +1,12 @@
+version: '3'
+services:
+  front:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    ports:
+      - 8090:8080

@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Union
 
 from fastapi import FastAPI
@@ -51,13 +52,25 @@ async def healthz():
 @api.post('/v1/chat')
 async def chat(message: Message):
     logger.info(message)
-    generation = chatbot.generate(
-        tokenizer=tokenizer,
-        model=model,
-        prompt=message.prompt,
-        context=message.context,
-        temperature=message.temperature,
-    )
-    return {
-        'generation': generation,
-    }
+    try:
+        generation = chatbot.generate(
+            tokenizer=tokenizer,
+            model=model,
+            prompt=message.prompt,
+            context=message.context,
+            temperature=message.temperature,
+        )
+        return {
+            'status': 'ok',
+            'generation': generation,
+        }
+    except:
+        return {
+            'status': 'error',
+            'message': traceback.format_exc(),
+        }
+
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(api, host='0.0.0.0', port=8080)

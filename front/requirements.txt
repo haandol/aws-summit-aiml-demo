@@ -1,0 +1,6 @@
+python-json-logger
+pydantic
+uvicorn
+fastapi
+python-dotenv
+requests

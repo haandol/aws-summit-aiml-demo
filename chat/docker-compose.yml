@@ -1,6 +1,6 @@
 version: '3'
 services:
-  polyglot:
+  chatbot:
     env_file:
       - .env
     build:
