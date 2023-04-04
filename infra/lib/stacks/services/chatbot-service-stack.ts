@@ -19,9 +19,9 @@ export class ChatbotServiceStack extends Stack {
     super(scope, id, props);
 
     const taskEnvs = {
-      CACHE_DIR: ecs.Secret.fromSsmParameter(
+      HUGGINGFACE_HUB_CACHE: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvCacheDir', {
-          stringValue: '/app/huggingface/.cache',
+          stringValue: '/mnt/huggingface/.cache',
         })
       ),
       NVIDIA_VISIBLE_DEVICES: ecs.Secret.fromSsmParameter(

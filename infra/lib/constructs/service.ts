@@ -42,7 +42,7 @@ export class CommonService extends Construct {
         ownerGid: '1000',
         permissions: '0777',
       },
-      path: '/app/huggingface',
+      path: '/huggingface',
       posixUser: {
         uid: '1000',
         gid: '1000',
