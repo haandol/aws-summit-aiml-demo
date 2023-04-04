@@ -25,7 +25,7 @@ CHAT_ENDPOINT = os.environ['CHAT_ENDPOINT']
 api = FastAPI()
 
 
-@api.get('/healthz')
+@api.get('/healthz/')
 async def healthz():
     return {
         'status': 'ok',

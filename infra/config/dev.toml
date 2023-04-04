@@ -16,8 +16,8 @@ port=8080
 [service.front]
 name="front"
 repositoryName="front"
-tag="85678f55ea"
+tag="ceda2c0aa3"
 [service.chatbot]
 name="chatbot"
 repositoryName="chatbot"
-tag="343fe0be2a"
+tag="ceda2c0aa3"

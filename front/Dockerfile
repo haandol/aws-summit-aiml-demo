@@ -1,6 +1,8 @@
 FROM --platform=linux/amd64 python:3.10-slim
 LABEL maintainer="ldg55d@gmail.com"
 
+RUN apt-get update && apt-get install -y curl
+
 WORKDIR /app
 
 COPY requirements.txt .

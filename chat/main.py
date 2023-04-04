@@ -42,7 +42,7 @@ async def startup_event():
     logger.info('Model loaded')
 
 
-@api.get('/healthz')
+@api.get('/healthz/')
 async def healthz():
     return {
         'status': 'ok',

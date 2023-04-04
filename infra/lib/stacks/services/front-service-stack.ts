@@ -39,7 +39,8 @@ export class FrontServiceStack extends Stack {
       vpc: props.vpc,
       targets: [ecsService],
       healthCheck: {
-        path: '/healthz',
+        enabled: true,
+        path: '/healthz/',
         healthyHttpCodes: '200-299',
       },
     });
