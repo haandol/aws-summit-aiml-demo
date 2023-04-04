@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import { VpcStack } from '../lib/stacks/vpc-stack';
 import { EcsClusterStack } from '../lib/stacks/ecs-cluster-stack';
 import { EfsStack } from '../lib/stacks/efs-stack';
+import { FrontServiceStack } from '../lib/stacks/services/front-service-stack';
 import { ChatbotServiceStack } from '../lib/stacks/services/chatbot-service-stack';
 import { Config } from '../config/loader';
 
@@ -43,6 +44,31 @@ const ecsClusterStack = new EcsClusterStack(
   }
 );
 ecsClusterStack.addDependency(vpcStack);
+
+const frontServiceStack = new FrontServiceStack(
+  app,
+  `${Config.app.ns}FrontServiceStack`,
+  {
+    vpc: vpcStack.vpc,
+    alb: ecsClusterStack.alb,
+    cluster: ecsClusterStack.cluster,
+    taskRole: ecsClusterStack.taskRole,
+    taskLogGroup: ecsClusterStack.taskLogGroup,
+    taskExecutionRole: ecsClusterStack.taskExecutionRole,
+    taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
+    service: {
+      name: Config.service.front.name,
+      repositoryName: Config.service.front.repositoryName,
+      port: Config.service.common.port,
+      tag: Config.service.common.tag,
+    },
+    env: {
+      account: Config.aws.account,
+      region: Config.aws.region,
+    },
+  }
+);
+frontServiceStack.addDependency(ecsClusterStack);
 
 const chatbotServiceStack = new ChatbotServiceStack(
   app,

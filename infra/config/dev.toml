@@ -14,6 +14,9 @@ id="" # e.g. vpc-xxx
 port=8080
 tag="a5365aa62b"
 
+[service.front]
+name="front"
+repositoryName="front"
 [service.chatbot]
 name="chatbot"
 repositoryName="chatbot"

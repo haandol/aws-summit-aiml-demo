@@ -11,7 +11,7 @@ interface IProps extends IServiceProps {
   alb: elbv2.IApplicationLoadBalancer;
 }
 
-export class FrontendServiceStack extends Stack {
+export class FrontServiceStack extends Stack {
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
 

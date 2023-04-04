@@ -26,6 +26,7 @@ export interface IConfig {
       port: number;
       tag: string;
     };
+    front: IService;
     chatbot: IService;
   };
 }
@@ -52,6 +53,10 @@ const schema = joi
       common: joi.object({
         port: joi.number().required(),
         tag: joi.string().required(),
+      }),
+      front: joi.object({
+        name: joi.string().required(),
+        repositoryName: joi.string().required(),
       }),
       chatbot: joi.object({
         name: joi.string().required(),
