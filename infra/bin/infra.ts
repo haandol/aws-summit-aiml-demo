@@ -57,10 +57,10 @@ const frontServiceStack = new FrontServiceStack(
     taskExecutionRole: ecsClusterStack.taskExecutionRole,
     taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
     service: {
+      port: Config.service.common.port,
       name: Config.service.front.name,
       repositoryName: Config.service.front.repositoryName,
-      port: Config.service.common.port,
-      tag: Config.service.common.tag,
+      tag: Config.service.front.tag,
     },
     env: {
       account: Config.aws.account,
@@ -82,10 +82,10 @@ const chatbotServiceStack = new ChatbotServiceStack(
     taskExecutionRole: ecsClusterStack.taskExecutionRole,
     taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
     service: {
+      port: Config.service.common.port,
       name: Config.service.chatbot.name,
       repositoryName: Config.service.chatbot.repositoryName,
-      port: Config.service.common.port,
-      tag: Config.service.common.tag,
+      tag: Config.service.chatbot.tag,
     },
     env: {
       account: Config.aws.account,

@@ -12,11 +12,12 @@ id="" # e.g. vpc-xxx
 [service]
 [service.common]
 port=8080
-tag="a5365aa62b"
 
 [service.front]
 name="front"
 repositoryName="front"
+tag="4fe312ee79"
 [service.chatbot]
 name="chatbot"
 repositoryName="chatbot"
+tag="a5365aa62b"

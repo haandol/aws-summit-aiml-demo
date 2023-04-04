@@ -225,14 +225,10 @@ export class EcsClusterStack extends Stack {
       },
       launchTemplate,
     });
-
     const capacityProvider = new ecs.AsgCapacityProvider(
       this,
       'AsgCapacityProvider',
-      {
-        autoScalingGroup,
-        machineImageType: ecs.MachineImageType.AMAZON_LINUX_2,
-      }
+      { autoScalingGroup }
     );
     cluster.addAsgCapacityProvider(capacityProvider);
 

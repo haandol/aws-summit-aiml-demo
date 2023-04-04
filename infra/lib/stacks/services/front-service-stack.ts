@@ -5,6 +5,7 @@ import { FrontService } from '../../constructs/front-service';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 interface IProps extends IServiceProps {
   vpc: ec2.IVpc;
@@ -15,8 +16,18 @@ export class FrontServiceStack extends Stack {
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
 
+    const ns = this.node.tryGetContext('ns') as string;
+    const taskEnvs = {
+      CHAT_ENDPOINT: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvChatEndpoint', {
+          stringValue: `chatbot.${ns.toLowerCase()}:${props.service.port}`,
+        })
+      ),
+    };
+
     const frontService = new FrontService(this, 'FrontService', {
       ...props,
+      taskEnvs,
     });
     this.registerServiceToLoadBalancer(frontService.ecsService, props);
   }

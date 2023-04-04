@@ -7,6 +7,7 @@ import { VpcValidator } from './validators';
 type IService = {
   name: string;
   repositoryName: string;
+  tag: string;
 };
 
 export interface IConfig {
@@ -24,7 +25,6 @@ export interface IConfig {
   service: {
     common: {
       port: number;
-      tag: string;
     };
     front: IService;
     chatbot: IService;
@@ -52,15 +52,16 @@ const schema = joi
     service: joi.object({
       common: joi.object({
         port: joi.number().required(),
-        tag: joi.string().required(),
       }),
       front: joi.object({
         name: joi.string().required(),
         repositoryName: joi.string().required(),
+        tag: joi.string().required(),
       }),
       chatbot: joi.object({
         name: joi.string().required(),
         repositoryName: joi.string().required(),
+        tag: joi.string().required(),
       }),
     }),
   })
