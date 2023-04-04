@@ -22,6 +22,7 @@ class Message(BaseModel):
 
 
 CHAT_ENDPOINT = os.environ['CHAT_ENDPOINT']
+logger.info(f'CHAT_ENDPOINT: {CHAT_ENDPOINT}')
 api = FastAPI()
 
 

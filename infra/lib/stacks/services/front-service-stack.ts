@@ -19,7 +19,7 @@ export class FrontServiceStack extends Stack {
     const taskEnvs = {
       CHAT_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvChatEndpoint', {
-          stringValue: `http://chatbot.chatbotdemodev:8080`,
+          stringValue: `http://chatbot.chatbotdemodev:8080/v1/chat/`,
         })
       ),
     };
