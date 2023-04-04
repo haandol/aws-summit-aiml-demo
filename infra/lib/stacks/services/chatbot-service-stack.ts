@@ -24,6 +24,11 @@ export class ChatbotServiceStack extends Stack {
           stringValue: '/app/huggingface/.cache',
         })
       ),
+      NVIDIA_VISIBLE_DEVICES: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvNvidiaVisibleDevices', {
+          stringValue: 'all',
+        })
+      ),
     };
 
     const chatbotService = new CommonService(this, 'ChatbotService', {

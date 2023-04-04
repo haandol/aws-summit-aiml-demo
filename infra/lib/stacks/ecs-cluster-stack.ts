@@ -40,6 +40,11 @@ export class EcsClusterStack extends Stack {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
     });
 
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(
+      'echo ECS_ENABLE_GPU_SUPPORT=true >> /etc/ecs/ecs.config',
+      'echo ECS_NVIDIA_RUNTIME=nvidia >> /etc/ecs/ecs.config'
+    );
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.P3,
@@ -55,7 +60,7 @@ export class EcsClusterStack extends Stack {
         },
       ],
       machineImage: ecs.EcsOptimizedImage.amazonLinux2(),
-      userData: ec2.UserData.forLinux(),
+      userData,
       detailedMonitoring: true,
       securityGroup,
       role,

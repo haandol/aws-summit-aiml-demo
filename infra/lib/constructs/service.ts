@@ -1,3 +1,4 @@
+import { Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -88,6 +89,7 @@ export class CommonService extends Construct {
       gpuCount: 1,
       logging,
       healthCheck: {
+        startPeriod: Duration.seconds(180),
         command: [
           'CMD-SHELL',
           `curl -f http://localhost:${props.service.port}/healthz/ || exit 1`,
