@@ -32,7 +32,7 @@ export class FrontendService extends Construct {
     );
     const logging = new ecs.AwsLogDriver({
       logGroup: props.taskLogGroup,
-      streamPrefix: ns.toLowerCase(),
+      streamPrefix: props.service.name,
     });
     taskDefinition.addContainer(`Container`, {
       containerName: props.service.name.toLowerCase(),
@@ -40,10 +40,8 @@ export class FrontendService extends Construct {
         serviceRepository,
         props.service.tag
       ),
-      gpuCount: 1,
       logging,
       healthCheck: {
-        startPeriod: Duration.seconds(180),
         command: [
           'CMD-SHELL',
           `curl -f http://localhost:${props.service.port}/healthz/ || exit 1`,
@@ -52,7 +50,7 @@ export class FrontendService extends Construct {
       portMappings: [
         { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
       ],
-      memoryReservationMiB: 1024,
+      memoryReservationMiB: 512,
     });
 
     return taskDefinition;

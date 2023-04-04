@@ -78,8 +78,11 @@ export class ChatbotService extends Construct {
           `curl -f http://localhost:${props.service.port}/healthz/ || exit 1`,
         ],
       },
-      secrets: props.taskEnvs,
+      portMappings: [
+        { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
+      ],
       memoryReservationMiB: 1024 * 16,
+      secrets: props.taskEnvs,
     });
     serviceContainer.addMountPoints({
       containerPath: '/mnt/huggingface',
