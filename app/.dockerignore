@@ -2,3 +2,5 @@
 .github
 .vscode
 .cache
+.DS_Store
+docker-compose.yml
