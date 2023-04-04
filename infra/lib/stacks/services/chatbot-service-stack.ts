@@ -19,8 +19,18 @@ export class ChatbotServiceStack extends Stack {
     super(scope, id, props);
 
     const taskEnvs = {
+      HF_HUB_OFFLINE: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvHfHubOffline', {
+          stringValue: '1',
+        })
+      ),
+      HF_HOME: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvHfHome', {
+          stringValue: '/mnt/huggingface',
+        })
+      ),
       HUGGINGFACE_HUB_CACHE: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvCacheDir', {
+        new ssm.StringParameter(this, 'EnvHfHubCache', {
           stringValue: '/mnt/huggingface/.cache',
         })
       ),
@@ -46,7 +56,6 @@ export class ChatbotServiceStack extends Stack {
       vpc: props.vpc,
       targets: [ecsService],
       healthCheck: {
-        enabled: true,
         path: '/healthz',
         healthyHttpCodes: '200-299',
       },

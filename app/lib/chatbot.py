@@ -22,7 +22,7 @@ PROMPT_DICT = {
 }
 
 
-def setup_model(model_name: str, cache_dir: str = None):
+def setup_model(model_name: str, cache_dir: str):
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
         cache_dir=cache_dir
@@ -79,8 +79,8 @@ if __name__ == '__main__':
     from dotenv import load_dotenv
     load_dotenv()
 
-    cache_dir = os.environ['CACHE_DIR']
     model_name = os.environ['MODEL_NAME']
+    cache_dir = os.environ['CACHE_DIR']
     tokenizer, model = setup_model(model_name, cache_dir)
 
     prompt = "입력받은 숫자가 prime number 인지 검사하는 python 코드"

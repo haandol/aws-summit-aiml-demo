@@ -53,12 +53,12 @@ export class EcsClusterStack extends Stack {
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.P3,
-        ec2.InstanceSize.XLARGE8
+        ec2.InstanceSize.XLARGE4
       ),
       blockDevices: [
         {
           deviceName: '/dev/xvda',
-          volume: ec2.BlockDeviceVolume.ebs(64, {
+          volume: ec2.BlockDeviceVolume.ebs(512, {
             volumeType: ec2.EbsDeviceVolumeType.GP2,
             encrypted: true,
           }),
@@ -218,6 +218,7 @@ export class EcsClusterStack extends Stack {
     const autoScalingGroup = new autoscaling.AutoScalingGroup(this, 'ASG', {
       vpc: props.vpc,
       minCapacity: 1,
+      desiredCapacity: 1,
       maxCapacity: 2,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
