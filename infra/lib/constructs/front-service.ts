@@ -1,10 +1,9 @@
-import { Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import { IServiceProps } from '../interfaces/types';
 
-export class FrontendService extends Construct {
+export class FrontService extends Construct {
   public readonly ecsService: ecs.Ec2Service;
 
   constructor(scope: Construct, id: string, props: IServiceProps) {

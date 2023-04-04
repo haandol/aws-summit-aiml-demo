@@ -1,7 +1,7 @@
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { IServiceProps } from '../../interfaces/types';
-import { FrontendService } from '../../constructs/frontend-service';
+import { FrontService } from '../../constructs/front-service';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -15,10 +15,10 @@ export class FrontServiceStack extends Stack {
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
 
-    const feService = new FrontendService(this, 'FrontendService', {
+    const frontService = new FrontService(this, 'FrontService', {
       ...props,
     });
-    this.registerServiceToLoadBalancer(feService.ecsService, props);
+    this.registerServiceToLoadBalancer(frontService.ecsService, props);
   }
 
   registerServiceToLoadBalancer(ecsService: ecs.Ec2Service, props: IProps) {
