@@ -38,6 +38,11 @@ export class EcsClusterStack extends Stack {
   newLaunchTemplate(securityGroup: ec2.ISecurityGroup): ec2.LaunchTemplate {
     const role = new iam.Role(this, 'LaunchTemplateRole', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName(
+          'service-role/AmazonEC2RoleforSSM'
+        ),
+      ],
     });
 
     const userData = ec2.UserData.forLinux();
@@ -53,7 +58,7 @@ export class EcsClusterStack extends Stack {
       blockDevices: [
         {
           deviceName: '/dev/xvda',
-          volume: ec2.BlockDeviceVolume.ebs(256, {
+          volume: ec2.BlockDeviceVolume.ebs(64, {
             volumeType: ec2.EbsDeviceVolumeType.GP2,
             encrypted: true,
           }),
