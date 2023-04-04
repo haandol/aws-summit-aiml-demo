@@ -49,7 +49,6 @@ const chatbotServiceStack = new ChatbotServiceStack(
   `${Config.app.ns}ChatbotServiceStack`,
   {
     vpc: vpcStack.vpc,
-    alb: ecsClusterStack.alb,
     fileSystem: efsStack.fileSystem,
     cluster: ecsClusterStack.cluster,
     taskRole: ecsClusterStack.taskRole,

@@ -1,17 +1,13 @@
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { IServiceProps } from '../../interfaces/types';
-import { CommonService } from '../../constructs/service';
-import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import { IChatbotServiceProps } from '../../interfaces/types';
+import { ChatbotService } from '../../constructs/chatbot-service';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 
-interface IProps extends IServiceProps {
+interface IProps extends IChatbotServiceProps {
   vpc: ec2.IVpc;
-  alb: elbv2.IApplicationLoadBalancer;
-  fileSystem: efs.IFileSystem;
 }
 
 export class ChatbotServiceStack extends Stack {
@@ -19,21 +15,6 @@ export class ChatbotServiceStack extends Stack {
     super(scope, id, props);
 
     const taskEnvs = {
-      HF_HUB_OFFLINE: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvHfHubOffline', {
-          stringValue: '1',
-        })
-      ),
-      HF_HOME: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvHfHome', {
-          stringValue: '/mnt/huggingface',
-        })
-      ),
-      HUGGINGFACE_HUB_CACHE: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvHfHubCache', {
-          stringValue: '/mnt/huggingface/.cache',
-        })
-      ),
       NVIDIA_VISIBLE_DEVICES: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvNvidiaVisibleDevices', {
           stringValue: 'all',
@@ -41,31 +22,9 @@ export class ChatbotServiceStack extends Stack {
       ),
     };
 
-    const chatbotService = new CommonService(this, 'ChatbotService', {
+    new ChatbotService(this, 'ChatbotService', {
       ...props,
       taskEnvs,
-    });
-
-    this.registerServiceToLoadBalancer(chatbotService.ecsService, props);
-  }
-
-  registerServiceToLoadBalancer(ecsService: ecs.Ec2Service, props: IProps) {
-    const targetGroup = new elbv2.ApplicationTargetGroup(this, 'ListenerRule', {
-      protocol: elbv2.ApplicationProtocol.HTTP,
-      port: props.service.port,
-      vpc: props.vpc,
-      targets: [ecsService],
-      healthCheck: {
-        path: '/healthz',
-        healthyHttpCodes: '200-299',
-      },
-    });
-
-    new elbv2.ApplicationListener(this, 'Listener', {
-      loadBalancer: props.alb,
-      protocol: elbv2.ApplicationProtocol.HTTP,
-      port: 8000,
-      defaultTargetGroups: [targetGroup],
     });
   }
 }
