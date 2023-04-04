@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from lib import logger, chatbot
+from lib.logger import logger
+from lib import chatbot
 
 load_dotenv()
 
