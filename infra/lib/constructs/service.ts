@@ -42,7 +42,7 @@ export class CommonService extends Construct {
         ownerGid: '1000',
         permissions: '0777',
       },
-      path: '/app/huggingface',
+      path: '/',
       posixUser: {
         uid: '1000',
         gid: '1000',
@@ -53,6 +53,7 @@ export class CommonService extends Construct {
     const volumeConfig: ecs.Volume = {
       name: 'efs-volume',
       efsVolumeConfiguration: {
+        rootDirectory: '/app/huggingface',
         transitEncryption: 'ENABLED',
         fileSystemId: props.fileSystem.fileSystemId,
         authorizationConfig: {
