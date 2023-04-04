@@ -49,6 +49,7 @@ export class FrontService extends Construct {
       portMappings: [
         { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
       ],
+      secrets: props.taskEnvs,
       memoryReservationMiB: 256,
     });
 
