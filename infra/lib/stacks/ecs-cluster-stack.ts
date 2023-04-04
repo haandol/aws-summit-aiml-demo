@@ -1,4 +1,4 @@
-import { Stack, StackProps, RemovalPolicy, CfnOutput } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -29,13 +29,9 @@ export class EcsClusterStack extends Stack {
     this.taskSecurityGroup = this.newSecurityGroup(props);
     this.taskLogGroup = this.newEcsTaskLogGroup();
 
-    const launchTemplate = this.newLaunchTemplate(this.taskSecurityGroup);
-    this.cluster = this.newEcsCluster(props, launchTemplate);
+    const cluster = this.newEcsCluster(props);
+    this.cluster = cluster;
 
-    this.alb = this.newApplicationLoadBalancer(props, this.taskSecurityGroup);
-  }
-
-  newLaunchTemplate(securityGroup: ec2.ISecurityGroup): ec2.LaunchTemplate {
     const role = new iam.Role(this, 'LaunchTemplateRole', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
@@ -44,16 +40,32 @@ export class EcsClusterStack extends Stack {
         ),
       ],
     });
+    const gpuLaunchTemplate = this.newGpuLaunchTemplate(
+      role,
+      this.taskSecurityGroup
+    );
+    const cpuLaunchTemplate = this.newCpuLaunchTemplate(
+      role,
+      this.taskSecurityGroup
+    );
+    this.updateAutoScalingGroup(cluster, gpuLaunchTemplate, cpuLaunchTemplate);
 
+    this.alb = this.newApplicationLoadBalancer(props, this.taskSecurityGroup);
+  }
+
+  newGpuLaunchTemplate(
+    role: iam.IRole,
+    securityGroup: ec2.ISecurityGroup
+  ): ec2.LaunchTemplate {
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
       'echo ECS_ENABLE_GPU_SUPPORT=true >> /etc/ecs/ecs.config',
       'echo ECS_NVIDIA_RUNTIME=nvidia >> /etc/ecs/ecs.config'
     );
-    const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
+    const launchTemplate = new ec2.LaunchTemplate(this, 'GpuLaunchTemplate', {
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.P3,
-        ec2.InstanceSize.XLARGE4
+        ec2.InstanceSize.XLARGE8
       ),
       blockDevices: [
         {
@@ -68,6 +80,33 @@ export class EcsClusterStack extends Stack {
         name: 'amzn2-ami-ecs-gpu-hvm-2.0.20230321-x86_64-ebs',
       }),
       userData,
+      detailedMonitoring: true,
+      securityGroup,
+      role,
+    });
+    return launchTemplate;
+  }
+
+  newCpuLaunchTemplate(
+    role: iam.IRole,
+    securityGroup: ec2.ISecurityGroup
+  ): ec2.LaunchTemplate {
+    const launchTemplate = new ec2.LaunchTemplate(this, 'CpuLaunchTemplate', {
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.M5,
+        ec2.InstanceSize.XLARGE2
+      ),
+      blockDevices: [
+        {
+          deviceName: '/dev/xvda',
+          volume: ec2.BlockDeviceVolume.ebs(128, {
+            volumeType: ec2.EbsDeviceVolumeType.GP2,
+            encrypted: true,
+          }),
+        },
+      ],
+      machineImage: ecs.EcsOptimizedImage.amazonLinux2(),
+      userData: ec2.UserData.forLinux(),
       detailedMonitoring: true,
       securityGroup,
       role,
@@ -165,7 +204,6 @@ export class EcsClusterStack extends Stack {
 
   newEcsTaskExecutionRole(): iam.Role {
     const ns = this.node.tryGetContext('ns') as string;
-
     const role = new iam.Role(this, `EcsTaskExecutionRole`, {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
       roleName: `${ns}EcsTaskExecutionRole`,
@@ -189,7 +227,7 @@ export class EcsClusterStack extends Stack {
     return role;
   }
 
-  newEcsTaskLogGroup(): logs.ILogGroup {
+  newEcsTaskLogGroup(): logs.LogGroup {
     const ns = this.node.tryGetContext('ns') as string;
     return new logs.LogGroup(this, `TaskLogGroup`, {
       logGroupName: `${ns}/ecs-task`,
@@ -197,10 +235,7 @@ export class EcsClusterStack extends Stack {
     });
   }
 
-  newEcsCluster(
-    props: IProps,
-    launchTemplate: ec2.ILaunchTemplate
-  ): ecs.ICluster {
+  newEcsCluster(props: IProps): ecs.Cluster {
     const ns = this.node.tryGetContext('ns') as string;
 
     const cluster = new ecs.Cluster(this, `Cluster`, {
@@ -215,27 +250,48 @@ export class EcsClusterStack extends Stack {
       containerInsights: true,
     });
 
-    const autoScalingGroup = new autoscaling.AutoScalingGroup(this, 'ASG', {
-      vpc: props.vpc,
+    return cluster;
+  }
+
+  updateAutoScalingGroup(
+    cluster: ecs.Cluster,
+    gpuLaunchTemplate: ec2.ILaunchTemplate,
+    cpuLaunchTemplate: ec2.ILaunchTemplate
+  ) {
+    const gpuAsg = new autoscaling.AutoScalingGroup(this, 'GpuAsg', {
+      vpc: cluster.vpc,
       minCapacity: 1,
       desiredCapacity: 1,
       maxCapacity: 2,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
-      launchTemplate,
+      launchTemplate: gpuLaunchTemplate,
     });
-    const capacityProvider = new ecs.AsgCapacityProvider(
-      this,
-      'AsgCapacityProvider',
-      { autoScalingGroup }
+    cluster.addAsgCapacityProvider(
+      new ecs.AsgCapacityProvider(this, 'GpuAsgCapacityProvider', {
+        autoScalingGroup: gpuAsg,
+      })
     );
-    cluster.addAsgCapacityProvider(capacityProvider);
 
-    return cluster;
+    const cpuAsg = new autoscaling.AutoScalingGroup(this, 'CpuAsg', {
+      vpc: cluster.vpc,
+      minCapacity: 1,
+      desiredCapacity: 1,
+      maxCapacity: 2,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      },
+      launchTemplate: cpuLaunchTemplate,
+    });
+    cluster.addAsgCapacityProvider(
+      new ecs.AsgCapacityProvider(this, 'CpuAsgCapacityProvider', {
+        autoScalingGroup: cpuAsg,
+      })
+    );
   }
 
-  newSecurityGroup(props: IProps): ec2.ISecurityGroup {
+  newSecurityGroup(props: IProps): ec2.SecurityGroup {
     const ns = this.node.tryGetContext('ns') as string;
 
     const securityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
@@ -257,20 +313,18 @@ export class EcsClusterStack extends Stack {
   newApplicationLoadBalancer(
     props: IProps,
     securityGroup: ec2.ISecurityGroup
-  ): elbv2.IApplicationLoadBalancer {
-    const ns = this.node.tryGetContext('ns') as string;
-
+  ): elbv2.ApplicationLoadBalancer {
     const alb = new elbv2.ApplicationLoadBalancer(this, `ApplicationLB`, {
       vpc: props.vpc,
       internetFacing: true,
       securityGroup,
     });
-
-    new CfnOutput(this, 'LoadBalancerDNS', {
-      exportName: `${ns}LoadBalancerDNS`,
-      value: alb.loadBalancerDnsName,
-    });
-
+    alb.connections.allowInternally(ec2.Port.allTcp(), 'Internal Service');
+    alb.connections.allowFrom(
+      ec2.Peer.ipv4(props.vpc.vpcCidrBlock),
+      ec2.Port.allTcp(),
+      'VPC Internal'
+    );
     return alb;
   }
 }

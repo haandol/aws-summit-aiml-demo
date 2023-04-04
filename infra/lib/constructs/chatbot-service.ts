@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as efs from 'aws-cdk-lib/aws-efs';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IChatbotServiceProps } from '../interfaces/types';
 
 export class ChatbotService extends Construct {
@@ -45,7 +46,7 @@ export class ChatbotService extends Construct {
     };
 
     const taskDefinition = new ecs.Ec2TaskDefinition(this, `TaskDefinition`, {
-      networkMode: ecs.NetworkMode.BRIDGE,
+      networkMode: ecs.NetworkMode.AWS_VPC,
       family: `${ns}${props.service.name}`,
       taskRole: props.taskRole,
       executionRole: props.taskExecutionRole,
@@ -109,6 +110,10 @@ export class ChatbotService extends Construct {
         name: props.service.name.toLowerCase(),
         containerPort: props.service.port,
       },
+      securityGroups: [props.taskSecurityGroup],
+      placementConstraints: [
+        ecs.PlacementConstraint.memberOf('attribute:ecs.instance-type =~ p3.*'),
+      ],
     });
 
     return service;

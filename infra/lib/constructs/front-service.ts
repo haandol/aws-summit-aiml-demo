@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IServiceProps } from '../interfaces/types';
 
 export class FrontService extends Construct {
@@ -17,7 +18,7 @@ export class FrontService extends Construct {
     const ns = this.node.tryGetContext('ns') as string;
 
     const taskDefinition = new ecs.Ec2TaskDefinition(this, `TaskDefinition`, {
-      networkMode: ecs.NetworkMode.BRIDGE,
+      networkMode: ecs.NetworkMode.AWS_VPC,
       family: `${ns}${props.service.name}`,
       taskRole: props.taskRole,
       executionRole: props.taskExecutionRole,
@@ -72,6 +73,21 @@ export class FrontService extends Construct {
         name: props.service.name.toLowerCase(),
         containerPort: props.service.port,
       },
+      securityGroups: [props.taskSecurityGroup],
+      placementConstraints: [
+        ecs.PlacementConstraint.memberOf('attribute:ecs.instance-type =~ m5.*'),
+      ],
+    });
+
+    const scalableTarget = service.autoScaleTaskCount({
+      minCapacity: 1,
+      maxCapacity: 3,
+    });
+    scalableTarget.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 70,
+    });
+    scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
+      targetUtilizationPercent: 70,
     });
 
     return service;

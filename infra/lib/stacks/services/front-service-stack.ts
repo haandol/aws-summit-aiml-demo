@@ -16,13 +16,10 @@ export class FrontServiceStack extends Stack {
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
 
-    const ns = this.node.tryGetContext('ns') as string;
     const taskEnvs = {
       CHAT_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvChatEndpoint', {
-          stringValue: `http://chatbot.${ns.toLowerCase()}:${
-            props.service.port
-          }`,
+          stringValue: `http://chatbot.chatbotdemodev:8080`,
         })
       ),
     };
