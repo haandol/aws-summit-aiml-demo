@@ -23,14 +23,15 @@ export class EcsClusterStack extends Stack {
   constructor(scope: Construct, id: string, props: IProps) {
     super(scope, id, props);
 
-    this.taskSecurityGroup = this.newSecurityGroup(props);
-    const launchTemplate = this.newLaunchTemplate(this.taskSecurityGroup);
-    this.cluster = this.newEcsCluster(props, launchTemplate);
-
     this.taskRole = this.newEcsTaskRole().withoutPolicyUpdates();
     this.taskExecutionRole =
       this.newEcsTaskExecutionRole().withoutPolicyUpdates();
+    this.taskSecurityGroup = this.newSecurityGroup(props);
     this.taskLogGroup = this.newEcsTaskLogGroup();
+
+    const launchTemplate = this.newLaunchTemplate(this.taskSecurityGroup);
+    this.cluster = this.newEcsCluster(props, launchTemplate);
+
     this.alb = this.newApplicationLoadBalancer(props, this.taskSecurityGroup);
   }
 
@@ -42,7 +43,7 @@ export class EcsClusterStack extends Stack {
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.P3,
-        ec2.InstanceSize.XLARGE2
+        ec2.InstanceSize.XLARGE8
       ),
       blockDevices: [
         {
@@ -55,6 +56,7 @@ export class EcsClusterStack extends Stack {
       ],
       machineImage: ecs.EcsOptimizedImage.amazonLinux2(),
       userData: ec2.UserData.forLinux(),
+      detailedMonitoring: true,
       securityGroup,
       role,
     });
@@ -208,9 +210,7 @@ export class EcsClusterStack extends Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
-      mixedInstancesPolicy: {
-        launchTemplate,
-      },
+      launchTemplate,
     });
 
     const capacityProvider = new ecs.AsgCapacityProvider(
