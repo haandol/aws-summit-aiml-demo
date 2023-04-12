@@ -13,9 +13,6 @@ load_dotenv()
 
 
 class Message(BaseModel):
-    context: Union[str, None] = Field(
-        default=None, title='context texts',
-    )
     prompt: str
     temperature: float = Field(
         default=0.1, title='temperature',
@@ -57,7 +54,6 @@ async def chat(message: Message):
             tokenizer=tokenizer,
             model=model,
             prompt=message.prompt,
-            context=message.context,
             temperature=message.temperature,
         )
         return {

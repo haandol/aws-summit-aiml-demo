@@ -6,21 +6,6 @@ if torch.cuda.is_available():
 else:
     device = "cpu"
 
-PROMPT_DICT = {
-    "prompt_input": (
-        "Below is an instruction that describes a task, paired with an input that provides further context.\n"
-        "아래는 작업을 설명하는 명령어와 추가적 맥락을 제공하는 입력이 짝을 이루는 예제입니다.\n\n"
-        "Write a response that appropriately completes the request.\n요청을 적절히 완료하는 응답을 작성하세요.\n\n"
-        "### Instruction(명령어):\n{instruction}\n\n### Input(입력):\n{context}\n\n### Response(응답):"
-    ),
-    "prompt_no_input": (
-        "Below is an instruction that describes a task.\n"
-        "아래는 작업을 설명하는 명령어입니다.\n\n"
-        "Write a response that appropriately completes the request.\n명령어에 따른 요청을 적절히 완료하는 응답을 작성하세요.\n\n"
-        "### Instruction(명령어):\n{instruction}\n\n### Response(응답):"
-    ),
-}
-
 
 def setup_model(model_name: str, cache_dir: str):
     tokenizer = AutoTokenizer.from_pretrained(
@@ -48,18 +33,12 @@ def generate(
     tokenizer: AutoTokenizer,
     model: AutoModelForCausalLM,
     prompt: str,
-    context: str = None,
     top_p: float = 0.8,
     top_k: int = 40,
     max_new_tokens: int = 128,
     temperature: float = 0.1,
 ):
-    if context:
-        x = PROMPT_DICT['prompt_input'].format(instruction=prompt, context=context)
-    else:
-        x = PROMPT_DICT['prompt_no_input'].format(instruction=prompt)
-
-    input_ids = tokenizer.encode(x, return_tensors="pt").to(model.device)
+    input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
         gen_tokens = model.generate(
             input_ids=input_ids,
@@ -71,7 +50,7 @@ def generate(
             no_repeat_ngram_size=6,
             pad_token_id=tokenizer.eos_token_id,
         )
-    return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(x):]
+    return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(prompt):]
 
 
 if __name__ == '__main__':
