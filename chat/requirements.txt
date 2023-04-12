@@ -7,7 +7,7 @@ python-dotenv
 git+https://github.com/huggingface/transformers.git
 git+https://github.com/huggingface/peft.git
 torch
-protobuf
+protobuf==3.20.3
 bitsandbytes==0.38.0.post1
 accelerate
 sentencepiece
