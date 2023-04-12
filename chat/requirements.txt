@@ -4,10 +4,10 @@ uvicorn
 fastapi
 python-dotenv
 
+torch==1.13.1
+protobuf==3.20.3
 git+https://github.com/huggingface/transformers.git
 git+https://github.com/huggingface/peft.git
-torch
-protobuf==3.20.3
 bitsandbytes==0.38.0.post1
-accelerate
-sentencepiece
+accelerate==0.18.0
+sentencepiece==0.1.98
