@@ -3,7 +3,6 @@ import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as efs from 'aws-cdk-lib/aws-efs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IChatbotServiceProps } from '../interfaces/types';
 
 export class ChatbotService extends Construct {
@@ -112,7 +111,9 @@ export class ChatbotService extends Construct {
       },
       securityGroups: [props.taskSecurityGroup],
       placementConstraints: [
-        ecs.PlacementConstraint.memberOf('attribute:ecs.instance-type =~ p3.*'),
+        ecs.PlacementConstraint.memberOf(
+          'attribute:ecs.instance-type =~ g4dn.*'
+        ),
       ],
     });
 
