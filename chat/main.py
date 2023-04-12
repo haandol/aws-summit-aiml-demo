@@ -34,8 +34,6 @@ async def startup_event():
     logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir}')
     tokenizer, model = chatbot.setup_model(
         model_name=model_name,
-        load_in_8bit=True,
-        device_map='auto',
         cache_dir=cache_dir,
     )
     logger.info('Model loaded')
