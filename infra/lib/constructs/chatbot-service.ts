@@ -72,7 +72,7 @@ export class ChatbotService extends Construct {
       essential: true,
       logging,
       healthCheck: {
-        startPeriod: Duration.seconds(180),
+        startPeriod: Duration.seconds(300),
         command: [
           'CMD-SHELL',
           `curl -f http://localhost:${props.service.port}/healthz/ || exit 1`,
