@@ -1,7 +1,16 @@
-FROM --platform=linux/amd64 pytorch/pytorch:1.13.1-cuda11.6-cudnn8-devel
+FROM --platform=linux/amd64 nvidia/cuda:11.8.0-devel-ubuntu22.04
 LABEL maintainer="ldg55d@gmail.com"
 
-RUN apt-get update && apt-get install -y git curl
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt install -y python3.10 \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
 WORKDIR /app
 

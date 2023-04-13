@@ -18,24 +18,17 @@ class Message(BaseModel):
     )
     
 
-model = None
-tokenizer = None
 api = FastAPI()
 
+model_name = os.environ['MODEL_NAME']
+cache_dir= os.environ['CACHE_DIR']
 
-@api.on_event("startup")
-async def startup_event():
-    global tokenizer, model
-
-    model_name = os.environ['MODEL_NAME']
-    cache_dir= os.environ['CACHE_DIR']
-
-    logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir}')
-    tokenizer, model = chatbot.setup_model(
-        model_name=model_name,
-        cache_dir=cache_dir,
-    )
-    logger.info('Model loaded')
+logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir}')
+tokenizer, model = chatbot.setup_model(
+    model_name=model_name,
+    cache_dir=cache_dir,
+)
+logger.info('Model loaded')
 
 
 @api.get('/healthz/')
@@ -47,6 +40,9 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
+    global tokenizer
+    global model
+
     logger.info(message)
     try:
         generation = chatbot.generate(
