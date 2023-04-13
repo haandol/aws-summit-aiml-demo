@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from lib.logger import logger
 
 if torch.cuda.is_available():
     device = "cuda"
@@ -13,6 +14,7 @@ def setup_model(model_name: str, cache_dir: str):
         cache_dir=cache_dir
     )
     if device == "cuda":
+        logger.info(f"Model loaded on GPU for device: {device}")
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             load_in_8bit=True,
@@ -20,6 +22,7 @@ def setup_model(model_name: str, cache_dir: str):
             cache_dir=cache_dir,
         )
     else:
+        logger.info(f"Model loaded on CPU")
         model = AutoModelForCausalLM.from_pretrained(
             model_name, device_map={"": device},
             low_cpu_mem_usage=True,
