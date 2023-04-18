@@ -47,13 +47,13 @@ class SearchAdapter(object):
         for article in resp.json():
             title = article['title'][0]
             link = article['link'][0]
-            lines.append(f'<li><a href="{link}">{title}</a></li>')
+            lines.append(f'<li><a href="{link}" target="_blank">{title}</a></li>')
         logger.info(f'lines: {lines}') 
         if lines:
             articles = ''.join(lines)
             return f'''
             <div>
-                <p>Here are some articles I found about {q}:</p>
+                <p>[|SA|]: Here are some articles I found about {q}:</p>
                 <ul class="articles">
                     {articles}
                 </ul>
