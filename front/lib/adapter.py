@@ -38,7 +38,8 @@ class SearchAdapter(object):
         self._endpoint = endpoint
     
     def search(self, q: str) -> str:
-        resp = requests.get(self._endpoint, params={'q': q}, timeout=30)
+        logger.info(f'q: {q}')
+        resp = requests.get(self._endpoint, params={'q': q}, timeout=10)
         if resp.status_code != 200:
             raise Exception('failed to request to search server..')
 
@@ -127,18 +128,25 @@ class ArchitectureWhisperer(object):
         self.question_classifier = QuestionClassifier(chatbot_adapter)
         self.category_classifier = CategoryClassifier(chatbot_adapter)
         self.chat_generator = ChatGenerator(chatbot_adapter)
-        
+
+    def refine_generation(self, user_input: str) -> str:
+        return list(filter(None, user_input.split('[|SA|]')))[0].split('\n')[0].strip()
+
     def orchestrate(self, user_input: str, context: str = ''):
         if not user_input:
             return 'You must input something.'
-
         logger.info(f'user_input: {user_input}')
+
         is_question = self.question_classifier.classify(user_input)
         logger.info(f'is_question: {is_question}')
+
         if is_question:
             category = self.category_classifier.classify(user_input)
             logger.info(f'category: {category}')
-            if category != 'Unknown':
-                return self.search_adapter.search(category)
 
-        return self.chat_generator.generate(user_input=user_input, context=context)
+            if 'Unknown' not in category:
+                return self.search_adapter.search(category.lower().replace('.', ''))
+
+        generation = self.chat_generator.generate(user_input=user_input, context=context)
+        logger.info(f'generation: {generation}')
+        return generation

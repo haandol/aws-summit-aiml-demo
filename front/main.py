@@ -61,7 +61,7 @@ async def chat(message: Message):
         logger.exception(traceback.format_exc())
         return {
             'status': 'error',
-            'generation': 'Sorry, I could not understand your question.'
+            'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
         }
 
 
