@@ -13,10 +13,12 @@ load_dotenv()
 
 
 class Message(BaseModel):
-    context: Union[str, None] = Field(
-        default=None, title='context texts',
+    context: str = Field(
+        default='', title='context texts',
     )
-    prompt: str
+    prompt: str = Field(
+        default='', title='prompt texts',
+    )
 
 
 SEARCH_ENDPOINT = os.environ['SEARCH_ENDPOINT']
