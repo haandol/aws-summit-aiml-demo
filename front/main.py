@@ -43,8 +43,14 @@ async def healthz():
 async def chat(message: Message):
     logger.info(f'user_input: {message}')
 
+    if not message.prompt:
+        return {
+            'status': 'error',
+            'generation': 'Sorry, You must input something.'
+        }
+
     try:
-        generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
+        generation = whisperer.orchestrate(user_input=message.prompt[:200], context=message.context[-500:])
         return {
             'status': 'ok',
             'generation': generation,
