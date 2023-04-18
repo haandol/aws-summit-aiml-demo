@@ -37,21 +37,18 @@ def generate(
     model: AutoModelForCausalLM,
     prompt: str,
     top_p: float = 0.8,
-    top_k: int = 40,
     max_new_tokens: int = 128,
-    temperature: float = 0.1,
+    temperature: float = 0.2,
 ):
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
         gen_tokens = model.generate(
             input_ids=input_ids,
-            max_new_tokens=max_new_tokens, 
-            num_return_sequences=1,
-            temperature=temperature,
             top_p=top_p,
-            top_k=top_k,
+            max_new_tokens=max_new_tokens, 
+            temperature=temperature,
+            num_return_sequences=1,
             no_repeat_ngram_size=6,
-            pad_token_id=tokenizer.eos_token_id,
         )
     return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(prompt):]
 
