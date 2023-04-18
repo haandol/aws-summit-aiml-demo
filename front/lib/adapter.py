@@ -21,7 +21,7 @@ class ChatbotAdapter(object):
             'max_new_tokens': max_new_tokens,
             'temperature': temperature,
         }
-        resp = requests.post(self._endpoint, json=body, timeout=5)
+        resp = requests.post(self._endpoint, json=body, timeout=30)
         if resp.status_code != 200:
             raise Exception('failed to request to chat server..')
 
@@ -38,7 +38,7 @@ class SearchAdapter(object):
         self._endpoint = endpoint
     
     def search(self, q: str) -> str:
-        resp = requests.get(self._endpoint, params={'q': q}, timeout=5)
+        resp = requests.get(self._endpoint, params={'q': q}, timeout=30)
         if resp.status_code != 200:
             raise Exception('failed to request to search server..')
 
