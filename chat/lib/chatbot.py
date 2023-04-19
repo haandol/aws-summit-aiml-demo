@@ -8,7 +8,7 @@ else:
     device = "cpu"
 
 
-def setup_model(model_name: str, cache_dir: str):
+def setup_model(model_name: str, cache_dir: str, load_in_8bit=False):
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
         cache_dir=cache_dir
@@ -18,6 +18,7 @@ def setup_model(model_name: str, cache_dir: str):
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
+            load_in_8bit=load_in_8bit,
             device_map='auto',
             cache_dir=cache_dir,
         )
@@ -61,7 +62,8 @@ if __name__ == '__main__':
 
     model_name = os.environ['MODEL_NAME']
     cache_dir = os.environ['CACHE_DIR']
-    tokenizer, model = setup_model(model_name, cache_dir)
+    load_in_8bit = os.environ.get('LOAD_IN_8BIT', False)
+    tokenizer, model = setup_model(model_name, cache_dir, load_in_8bit=load_in_8bit)
 
     prompt = "입력받은 숫자가 prime number 인지 검사하는 python 코드"
     generation = generate(tokenizer, model, prompt)
