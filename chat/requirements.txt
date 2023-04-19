@@ -7,6 +7,6 @@ python-dotenv
 protobuf==3.20.3
 git+https://github.com/huggingface/transformers.git
 git+https://github.com/huggingface/peft.git
-bitsandbytes==0.38.0.post1
+bitsandbytes==0.38.0.post2
 accelerate==0.18.0
 sentencepiece==0.1.98

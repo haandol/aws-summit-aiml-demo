@@ -17,7 +17,7 @@ def setup_model(model_name: str, cache_dir: str):
         logger.info(f"Model loaded on GPU for device: {device}")
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            load_in_8bit=True,
+            torch_dtype=torch.float16,
             device_map='auto',
             cache_dir=cache_dir,
         )
@@ -25,6 +25,7 @@ def setup_model(model_name: str, cache_dir: str):
         logger.info(f"Model loaded on CPU")
         model = AutoModelForCausalLM.from_pretrained(
             model_name, device_map={"": device},
+            torch_dtype=torch.float16,
             low_cpu_mem_usage=True,
             cache_dir=cache_dir,
         )
