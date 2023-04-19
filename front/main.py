@@ -1,6 +1,5 @@
 import os
 import traceback
-from typing import Union
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -43,7 +42,7 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    logger.info(f'user_input: {message}')
+    logger.info(f'user_input: {message.json()}')
 
     if not message.prompt:
         return {
@@ -51,8 +50,14 @@ async def chat(message: Message):
             'generation': 'Sorry, You must input something.'
         }
 
+    if len(message.prompt) > 180:
+        return {
+            'status': 'error',
+            'generation': 'Sorry, Your input is too long. > 180 characters.'
+        }
+
     try:
-        generation = whisperer.orchestrate(user_input=message.prompt[:200], context=message.context[-500:])
+        generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
         return {
             'status': 'ok',
             'generation': generation,
