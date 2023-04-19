@@ -55,7 +55,7 @@ Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted 
 [|SA|]: Hi, I am ArchitectureWhisperer. Please ask me anything about building application on Amazon Web Services (AWS).
 
 [|Human|]: Could you list AWS Services related to AI/ML?
-[|SA|]: Sure, Here are the services about Machine Learning (ML) and Artificial Intelligence (AI) on AWS. Amazon Augmented AI, Amazon CodeGuru, Amazon CodeWhisperer, Amazon Comprehend, Amazon DevOps Guru, Amazon Forecast, Amazon Fraud Detector, Amazon HealthLake, Amazon Comprehend Medical, Amazon Kendra, Amazon Lex, Amazon Lookout for Equipment, Amazon Lookout for Metrics, Amazon Lookout for Vision, Amazon Monitron, AWS Panorama, Amazon Personalize, Amazon Polly, Amazon Rekognition, Amazon SageMaker, Amazon Textract, Amazon Transcribe, Amazon Translate, AWS DeepComposer, AWS DeepLens, AWS DeepRacer.
+[|SA|]: Sure, Here are the services about Machine Learning (ML) and Artificial Intelligence (AI) on AWS. Amazon Augmented AI, Amazon CodeWhisperer, Amazon Comprehend, Amazon Forecast, Amazon Fraud Detector, Amazon Lex, Amazon Personalize, Amazon Polly, Amazon Rekognition, Amazon SageMaker, Amazon Textract, Amazon Transcribe, Amazon Translate.
 
 {context}
 
