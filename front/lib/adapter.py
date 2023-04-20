@@ -105,8 +105,14 @@ class CategoryClassifier(object):
 class ChatGenerator(object):
     def __init__(self, adapter: ChatbotAdapter) -> None:
         self.adapter = adapter
+        self.ID_SYMBOL = '[|'
 
-    def generate( self, user_input: str, context: str = ''):
+    def refine(self, generation: str):
+        if self.ID_SYMBOL in generation:
+            generation = generation[:generation.index(self.ID_SYMBOL)]
+        return generation
+
+    def generate(self, user_input: str, context: str = ''):
         prompt = PROMPT['chat'].format(user_input=user_input, context=context)
         generation = self.adapter.generate(
             prompt=prompt,
@@ -115,8 +121,9 @@ class ChatGenerator(object):
             temperature=0.2,
             do_sample=True,
         )
-        logger.info(f'chat generation: {generation}')
-        return generation
+        refined = self.refine(generation)
+        logger.info(f'chat generation and refined: {generation} => {refined}')
+        return refined
 
 
 class ArchitectureWhisperer(object):
