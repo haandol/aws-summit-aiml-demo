@@ -108,8 +108,9 @@ class ChatGenerator(object):
         self.ID_SYMBOL = '[|'
 
     def refine(self, generation: str):
-        if self.ID_SYMBOL in generation:
-            generation = generation[:generation.index(self.ID_SYMBOL)]
+        sindex = generation.find(self.ID_SYMBOL)
+        if sindex > 0:
+            generation = generation[:sindex]
         return generation
 
     def generate(self, user_input: str, context: str = ''):
