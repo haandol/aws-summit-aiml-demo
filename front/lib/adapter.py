@@ -48,8 +48,8 @@ class SearchAdapter(object):
 
         lines = []
         for article in resp.json():
-            title = article['title'][0]
-            link = article['link'][0]
+            title = article['title']
+            link = article['link']
             lines.append(f'<li><a href="{link}" target="_blank">{title}</a></li>')
         logger.info(f'lines: {lines}') 
         if lines:
