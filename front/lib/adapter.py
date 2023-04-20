@@ -141,7 +141,7 @@ class ArchitectureWhisperer(object):
             category = self.category_classifier.classify(user_input)
             logger.info(f'category: {category}')
 
-            if category == CATEGORY_UNKNOWN:
+            if category != CATEGORY_UNKNOWN:
                 return self.search_adapter.search(category.lower().replace('.', ''))
 
         generation = self.chat_generator.generate(user_input=user_input, context=context)
