@@ -22,7 +22,10 @@ class Message(BaseModel):
     temperature: float = Field(
         default=0.2, title='temperature',
     )
-    
+    do_sample: bool = Field(
+        default=False, title='do_sample',
+    )
+
 
 api = FastAPI()
 
@@ -60,6 +63,7 @@ async def chat(message: Message):
             top_p=message.top_p,
             max_new_tokens=message.max_new_tokens,
             temperature=message.temperature,
+            do_sample=message.do_sample,
         )
         return {
             'status': 'ok',

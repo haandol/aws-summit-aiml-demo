@@ -8,32 +8,14 @@ Sentence: I want to create a online shop for selling cell-phones.
 Answer: statement.
 
 Sentence: {user_input}
+Answer:
 '''.strip()
 
 CATEGORY_PROMPT = '''
 Please label the category towards the sentence.
 Use 'Unknown' for all unknown categories.
 Use the following list as only available Category. Do not make up new category other than the list.
-- Unknown
-- Advertising and Marketing
-- Automotive
-- Consumer Packaged Goods
-- Education
-- Energy
-- Financial Services
-- Games
-- Government
-- Health
-- Industrial
-- Manufacturing
-- Media and Entertainment
-- Nonprofits
-- Power and Utilities
-- Retail
-- Semiconductor and Electronics
-- Sports
-- Telecom
-- Travel and Hospitality
+{categories}
 
 Sentence: What is the easiest way to build an application on Amazon Web Services (AWS)?
 Category: Unknown.
@@ -42,10 +24,11 @@ Sentence: I want to optimize the delivery system for big super-markets, but what
 Category: Retail.
 
 Sentence: {user_input}
+Category:
 '''.strip()
 
 CHAT_PROMPT = '''
-The following is a conversation between a human and an AI assistant named ArchitectureWhisperer.
+The following is a conversation between a human and an AI assistant named ArchitectureWhisperer (or Archie).
 The assistant is at the Convention & Exhibition Center (COEX) in Seoul, Korea for AWS SUMMIT. The assistant tone is technical and scientific.
 The human and the assistant take turns chatting.
 The human statements start with [|Human|] and the assistant statements start with [|SA|].
@@ -60,7 +43,32 @@ Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted 
 {context}
 
 [|Human|]: {user_input}
+[|SA|]:
 '''.strip()
+
+CATEGORY_UNKNOWN = 'Unknown'
+CATEGORIES = '\n'.join([
+    '- {CATEGORY_UNKNOWN}',
+    '- Advertising and Marketing',
+    '- Automotive',
+    '- Consumer Packaged Goods',
+    '- Education',
+    '- Energy',
+    '- Financial Services',
+    '- Games',
+    '- Government',
+    '- Health',
+    '- Industrial',
+    '- Manufacturing',
+    '- Media and Entertainment',
+    '- Nonprofits',
+    '- Power and Utilities',
+    '- Retail',
+    '- Semiconductor and Electronics',
+    '- Sports',
+    '- Telecom',
+    '- Travel and Hospitality',
+])
 
 PROMPT = {
     'question': QUESTION_PROMPT,

@@ -1,20 +1,11 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, StoppingCriteria, StoppingCriteriaList
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from lib.logger import logger
 
 if torch.cuda.is_available():
     device = "cuda"
 else:
     device = "cpu"
-
-
-class StopOnTokens(StoppingCriteria):
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
-        stop_ids = [50278, 50279, 50277, 1, 0]
-        for stop_id in stop_ids:
-            if input_ids[0][-1] == stop_id:
-                return True
-        return False
 
 
 def setup_model(model_name: str, cache_dir: str, load_in_8bit=False):
@@ -50,17 +41,16 @@ def generate(
     top_p: float = 0.8,
     max_new_tokens: int = 128,
     temperature: float = 0.2,
+    do_sample: bool = False,
 ):
-    inputs = tokenizer(prompt, return_tensors='pt').to(model.device)
+    input_ids = tokenizer.encode(prompt, return_tensors='pt').to(model.device)
     with torch.no_grad():
         gen_tokens = model.generate(
-            **inputs,
-            labels=inputs['input_ids'],
+            input_ids=input_ids,
             top_p=top_p,
             max_new_tokens=max_new_tokens, 
             temperature=temperature,
-            do_sample=True,
-            stopping_criteria=StoppingCriteriaList([StopOnTokens()]),
+            do_sample=do_sample,
             num_return_sequences=1,
             no_repeat_ngram_size=6,
             pad_token_id=tokenizer.eos_token_id,

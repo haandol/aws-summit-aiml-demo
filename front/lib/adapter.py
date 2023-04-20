@@ -1,8 +1,7 @@
-import re
 import requests
 
 from .logger import logger
-from .prompt import PROMPT
+from .prompt import PROMPT, CATEGORIES, CATEGORY_UNKNOWN
 
 
 class ChatbotAdapter(object):
@@ -14,12 +13,14 @@ class ChatbotAdapter(object):
         top_p: float = 0.8,
         max_new_tokens: int = 128,
         temperature: float = 0.2,
+        do_sample: bool = False,
     ) -> str:
         body = {
             'prompt': prompt,
             'top_p': top_p,
             'max_new_tokens': max_new_tokens,
             'temperature': temperature,
+            'do_sample': do_sample,
         }
         resp = requests.post(self._endpoint, json=body, timeout=30)
         if resp.status_code != 200:
@@ -53,7 +54,7 @@ class SearchAdapter(object):
             articles = ''.join(lines)
             return f'''
             <div>
-                <p>[|SA|]: Here are some articles I found about {q}:</p>
+                <p>Here are some articles I found about {q}:</p>
                 <ul class="articles">
                     {articles}
                 </ul>
@@ -82,25 +83,23 @@ class QuestionClassifier(object):
 class CategoryClassifier(object):
     def __init__(self, adapter: ChatbotAdapter) -> None:
         self.adapter = adapter
-        self.pattern = re.compile(r'Category: (\w+)')
 
     def classify( self, user_input: str) -> str:
-        prompt = PROMPT['category'].format(user_input=user_input)
+        prompt = PROMPT['category'].format(user_input=user_input, categories=CATEGORIES)
         generation = self.adapter.generate(
             prompt=prompt,
             top_p=0.95,
             max_new_tokens=8,
             temperature=0.02,
         )
-        logger.info(f'biz generation: {generation}')
+        category = generation.strip().replace('.', '')
+        logger.info(f'biz generation and category: {generation} => {category}')
 
-        founds = self.pattern.findall(generation)
-        logger.info(f'founds: {founds}')
-        if founds:
-            return founds[0]
+        if category and category in CATEGORIES:
+            return category
         else:
-            logger.warning('not found category')
-            return 'Unknown'
+            logger.warning(f'not found category: {category}')
+            return CATEGORY_UNKNOWN
 
 
 class ChatGenerator(object):
@@ -114,6 +113,7 @@ class ChatGenerator(object):
             top_p=0.8,
             max_new_tokens=128,
             temperature=0.2,
+            do_sample=True,
         )
         logger.info(f'chat generation: {generation}')
         return generation
@@ -129,9 +129,6 @@ class ArchitectureWhisperer(object):
         self.category_classifier = CategoryClassifier(chatbot_adapter)
         self.chat_generator = ChatGenerator(chatbot_adapter)
 
-    def refine_generation(self, user_input: str) -> str:
-        return list(filter(None, user_input.split('[|SA|]')))[0].split('\n')[0].strip()
-
     def orchestrate(self, user_input: str, context: str = ''):
         if not user_input:
             return 'You must input something.'
@@ -144,7 +141,7 @@ class ArchitectureWhisperer(object):
             category = self.category_classifier.classify(user_input)
             logger.info(f'category: {category}')
 
-            if 'Unknown' not in category:
+            if category == CATEGORY_UNKNOWN:
                 return self.search_adapter.search(category.lower().replace('.', ''))
 
         generation = self.chat_generator.generate(user_input=user_input, context=context)
