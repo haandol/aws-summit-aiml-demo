@@ -13,6 +13,9 @@ load_dotenv()
 
 class Message(BaseModel):
     prompt: str
+    top_k: int = Field(
+        default=50, title='top_k',
+    )
     top_p: float = Field(
         default=0.8, title='top_p',
     )
@@ -60,6 +63,7 @@ async def chat(message: Message):
             tokenizer=tokenizer,
             model=model,
             prompt=message.prompt,
+            top_k=message.top_k,
             top_p=message.top_p,
             max_new_tokens=message.max_new_tokens,
             temperature=message.temperature,

@@ -10,13 +10,15 @@ class ChatbotAdapter(object):
 
     def generate(self,
         prompt: str,
-        top_p: float = 0.8,
+        top_k: int = 50,
+        top_p: float = 0.92,
         max_new_tokens: int = 128,
-        temperature: float = 0.2,
+        temperature: float = 0.4,
         do_sample: bool = False,
     ) -> str:
         body = {
             'prompt': prompt,
+            'top_k': top_k,
             'top_p': top_p,
             'max_new_tokens': max_new_tokens,
             'temperature': temperature,
@@ -72,7 +74,8 @@ class QuestionClassifier(object):
         prompt = PROMPT['question'].format(user_input=user_input)
         generation = self.adapter.generate(
             prompt=prompt,
-            top_p=0.95,
+            top_k=40,
+            top_p=0.7,
             max_new_tokens=8,
             temperature=0.02,
         )
@@ -88,7 +91,8 @@ class CategoryClassifier(object):
         prompt = PROMPT['category'].format(user_input=user_input, categories=CATEGORIES)
         generation = self.adapter.generate(
             prompt=prompt,
-            top_p=0.95,
+            top_k=40,
+            top_p=0.7,
             max_new_tokens=8,
             temperature=0.02,
         )
@@ -117,9 +121,10 @@ class ChatGenerator(object):
         prompt = PROMPT['chat'].format(user_input=user_input, context=context)
         generation = self.adapter.generate(
             prompt=prompt,
-            top_p=0.8,
+            top_k=50,
+            top_p=0.92,
             max_new_tokens=128,
-            temperature=0.2,
+            temperature=0.4,
             do_sample=True,
         )
         refined = self.refine(generation)

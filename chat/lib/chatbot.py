@@ -38,7 +38,8 @@ def generate(
     tokenizer: AutoTokenizer,
     model: AutoModelForCausalLM,
     prompt: str,
-    top_p: float = 0.8,
+    top_k: int = 50,
+    top_p: float = 0.9,
     max_new_tokens: int = 128,
     temperature: float = 0.2,
     do_sample: bool = False,
@@ -47,6 +48,7 @@ def generate(
     with torch.no_grad():
         gen_tokens = model.generate(
             input_ids=input_ids,
+            top_k=top_k,
             top_p=top_p,
             max_new_tokens=max_new_tokens, 
             temperature=temperature,
