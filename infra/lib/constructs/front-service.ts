@@ -34,7 +34,7 @@ export class FrontService extends Construct {
       logGroup: props.taskLogGroup,
       streamPrefix: props.service.name,
     });
-    taskDefinition.addContainer(`Container`, {
+    const serviceContainer = taskDefinition.addContainer(`ServiceContainer`, {
       containerName: props.service.name.toLowerCase(),
       image: ecs.ContainerImage.fromEcrRepository(
         serviceRepository,
@@ -53,6 +53,16 @@ export class FrontService extends Construct {
       secrets: props.taskEnvs,
       memoryReservationMiB: 256,
     });
+    const xrayContainer = taskDefinition.addContainer(`XrayContainer`, {
+      containerName: 'xray-daemon',
+      image: ecs.ContainerImage.fromRegistry(
+        'public.ecr.aws/xray/aws-xray-daemon:latest'
+      ),
+      portMappings: [{ containerPort: 2000, protocol: ecs.Protocol.UDP }],
+      cpu: 32,
+      memoryReservationMiB: 256,
+    });
+    serviceContainer.addLink(xrayContainer);
 
     return taskDefinition;
   }
