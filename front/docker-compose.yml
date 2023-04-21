@@ -14,5 +14,6 @@ services:
     image: front:aeec25fef6
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-otel-collector:4317
+      - OTEL_SERVICE_NAME=front
     ports:
       - 8090:8080

@@ -22,9 +22,14 @@ export class FrontServiceStack extends Stack {
           stringValue: `http://chatbot.chatbotdemodev:8080/v1/chat/`,
         })
       ),
+      OTEL_SERVICE_NAME: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvOtelService', {
+          stringValue: `front`,
+        })
+      ),
       OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvOtelDaemon', {
-          stringValue: `http://172.17.0.1:4317`,
+          stringValue: `http://otel.chatbotdemodev:4317`,
         })
       ),
     };

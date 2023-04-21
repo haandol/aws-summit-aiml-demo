@@ -26,7 +26,7 @@ export class XrayDaemonServiceStack extends Stack {
     const ns = this.node.tryGetContext('ns') as string;
 
     const taskDefinition = new ecs.Ec2TaskDefinition(this, `TaskDefinition`, {
-      networkMode: ecs.NetworkMode.HOST,
+      networkMode: ecs.NetworkMode.AWS_VPC,
       family: `${ns}XrayDaemon`,
       taskRole: props.taskRole,
       executionRole: props.taskExecutionRole,
@@ -38,7 +38,6 @@ export class XrayDaemonServiceStack extends Stack {
     });
     taskDefinition.addContainer(`OTelContainer`, {
       containerName: 'aws-otel-collector',
-      hostname: 'aws-otel-collector',
       image: ecs.ContainerImage.fromRegistry('amazon/aws-otel-collector'),
       command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml'],
       portMappings: [
@@ -66,6 +65,11 @@ export class XrayDaemonServiceStack extends Stack {
       circuitBreaker: { rollback: true },
       taskDefinition,
       daemon: true,
+      cloudMapOptions: {
+        name: 'otel',
+        containerPort: 4317,
+      },
+      securityGroups: [props.taskSecurityGroup],
     });
     return service;
   }
