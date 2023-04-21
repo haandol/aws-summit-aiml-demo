@@ -45,6 +45,7 @@ tokenizer, model = chatbot.setup_model(
 logger.info('Model loaded')
 
 
+@api.get('/healthz')
 @api.get('/healthz/')
 async def healthz():
     return {
@@ -52,6 +53,7 @@ async def healthz():
     }
 
 
+@api.post('/v1/chat')
 @api.post('/v1/chat/')
 async def chat(message: Message):
     global tokenizer

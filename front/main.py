@@ -60,6 +60,7 @@ async def init_otel_span(request: Request, call_next):
         return response
 
 
+@api.get('/healthz')
 @api.get('/healthz/')
 async def healthz():
     return {
@@ -67,6 +68,7 @@ async def healthz():
     }
 
 
+@api.post('/v1/chat')
 @api.post('/v1/chat/')
 async def chat(message: Message):
     with tracer.start_as_current_span('chat') as span:
