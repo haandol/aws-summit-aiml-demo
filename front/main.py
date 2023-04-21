@@ -5,12 +5,13 @@ from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from aws_xray_sdk.core import xray_recorder, patch_all
+from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
 from aws_xray_sdk.core.models import http
 
 from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
-xray_recorder.configure(service='front')
+xray_recorder.configure(service='front', sampler=LocalSampler())
 plugins = ('ECSPlugin',)
 rules = {
   "version": 2,
