@@ -301,12 +301,12 @@ export class EcsClusterStack extends Stack {
       vpc: props.vpc,
     });
     securityGroup.connections.allowInternally(
-      ec2.Port.allTcp(),
+      ec2.Port.allTraffic(),
       'Internal Service'
     );
     securityGroup.connections.allowFrom(
       ec2.Peer.ipv4(props.vpc.vpcCidrBlock),
-      ec2.Port.allTcp()
+      ec2.Port.allTraffic()
     );
 
     return securityGroup;
