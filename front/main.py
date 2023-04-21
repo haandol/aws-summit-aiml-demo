@@ -88,7 +88,7 @@ async def chat(message: Message):
     segment.put_metadata('message', message.json())
 
     if not message.prompt:
-        segment.add_exception(Exception('Sorry, You must input something.'))
+        segment.add_exception(Exception('Sorry, You must input something.'), None)
         segment.close()
         return {
             'status': 'error',
@@ -96,7 +96,7 @@ async def chat(message: Message):
         }
 
     if len(message.prompt) > 180:
-        segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'))
+        segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'), None)
         segment.close()
         return {
             'status': 'error',
@@ -111,9 +111,9 @@ async def chat(message: Message):
             'status': 'ok',
             'generation': generation,
         }
-    except:
+    except Exception as e:
         logger.exception(traceback.format_exc())
-        segment.add_exception(traceback.format_exc())
+        segment.add_exception(e, traceback.extract_stack())
         segment.close()
         return {
             'status': 'error',
