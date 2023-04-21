@@ -38,10 +38,10 @@ def generate(
     tokenizer: AutoTokenizer,
     model: AutoModelForCausalLM,
     prompt: str,
-    top_k: int = 50,
-    top_p: float = 0.9,
-    max_new_tokens: int = 128,
-    temperature: float = 0.2,
+    top_k: int = 0,
+    top_p: float = 1.0,
+    max_new_tokens: int = 32,
+    temperature: float = 0.5,
     do_sample: bool = False,
 ):
     input_ids = tokenizer.encode(prompt, return_tensors='pt').to(model.device)
@@ -53,9 +53,9 @@ def generate(
             max_new_tokens=max_new_tokens, 
             temperature=temperature,
             do_sample=do_sample,
+            pad_token_id=tokenizer.eos_token_id,
             num_return_sequences=1,
             no_repeat_ngram_size=6,
-            pad_token_id=tokenizer.eos_token_id,
         )
     return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(prompt):]
 

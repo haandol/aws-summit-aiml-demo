@@ -14,16 +14,16 @@ load_dotenv()
 class Message(BaseModel):
     prompt: str
     top_k: int = Field(
-        default=50, title='top_k',
+        default=0, title='top_k',
     )
     top_p: float = Field(
-        default=0.8, title='top_p',
+        default=1, title='top_p',
     )
     max_new_tokens: int = Field(
-        default=128, title='max_new_tokens',
+        default=32, title='max_new_tokens',
     )
     temperature: float = Field(
-        default=0.2, title='temperature',
+        default=0.5, title='temperature',
     )
     do_sample: bool = Field(
         default=False, title='do_sample',

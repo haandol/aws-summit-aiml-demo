@@ -49,6 +49,7 @@ Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted 
 CATEGORY_UNKNOWN = 'Unknown'
 CATEGORIES = '\n'.join([
     '- {CATEGORY_UNKNOWN}',
+    # Industry Category
     '- Advertising and Marketing',
     '- Automotive',
     '- Consumer Packaged Goods',
@@ -68,6 +69,23 @@ CATEGORIES = '\n'.join([
     '- Sports',
     '- Telecom',
     '- Travel and Hospitality',
+    # Service Category
+    '- Analytics',
+    '- Application Integration',
+    '- AR and VR',
+    '- Blockchain',
+    '- Contact Center',
+    '- End User Computing',
+    '- Web and Mobile Services',
+    '- Internet of Things (IoT)',
+    '- Machine Learning (ML) and Artificial Intelligence (AI)',
+    '- Management and Governance',
+    '- Migration and Transfer',
+    '- Networking and Content Delivery',
+    '- Quantum Technologies',
+    '- Robotics',
+    '- Satellite',
+    '- Security, Identity, and Compliance',
 ])
 
 PROMPT = {
