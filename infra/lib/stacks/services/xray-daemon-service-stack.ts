@@ -39,9 +39,7 @@ export class XrayDaemonServiceStack extends Stack {
     taskDefinition.addContainer(`OTelContainer`, {
       containerName: 'aws-otel-collector',
       hostname: 'aws-otel-collector',
-      image: ecs.ContainerImage.fromRegistry(
-        'public.ecr.aws/aws-observability/aws-otel-collector'
-      ),
+      image: ecs.ContainerImage.fromRegistry('amazon/aws-otel-collector'),
       command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml'],
       portMappings: [
         { containerPort: 4317, protocol: ecs.Protocol.TCP, hostPort: 4317 },
@@ -54,7 +52,7 @@ export class XrayDaemonServiceStack extends Stack {
         ),
       },
       logging,
-      cpu: 50,
+      cpu: 100,
       memoryReservationMiB: 128,
     });
 
