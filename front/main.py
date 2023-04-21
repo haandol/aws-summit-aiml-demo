@@ -1,13 +1,37 @@
 import os
 import traceback
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from aws_xray_sdk.core import xray_recorder, patch_all
+from aws_xray_sdk.core.models import http
+from aws_xray_sdk.core.async_context import AsyncContext
 
 from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
+xray_recorder.configure(service='front', context=AsyncContext())
+plugins = ('ECSPlugin', 'EC2Plugin')
+rules = {
+  "version": 2,
+  "rules": [
+    {
+      "description": "health check",
+      "host": "*",
+      "http_method": "GET",
+      "url_path": "/healthz",
+      "fixed_target": 0,
+      "rate": 0.0
+    }
+  ],
+  "default": {
+    "fixed_target": 1,
+    "rate": 1.0
+  }
+}
+xray_recorder.configure(plugins=plugins, sampling_rules=rules)
+patch_all()
 load_dotenv()
 
 
@@ -32,6 +56,23 @@ whisperer = ArchitectureWhisperer(
 
 api = FastAPI()
 
+@api.middleware("xray")
+async def init_xray_segment(request: Request, call_next):
+    if request.url.path == '/healthz/':
+        return await call_next(request)
+
+    segment = xray_recorder.begin_segment(name=request.url.path)
+    segment.put_http_meta(http.URL, str(request.url))
+    segment.put_http_meta(http.USER_AGENT, request.headers.get('User-Agent'))
+    segment.put_http_meta(http.X_FORWARDED_FOR, request.headers.get('X-Forwarded-For'))
+    segment.put_http_meta(http.XRAY_HEADER, segment.trace_id)
+    segment.put_http_meta(http.METHOD, request.method)
+
+    response: Response = await call_next(request)
+    segment.put_http_meta(http.STATUS, response.status_code)
+    segment.close()
+    return response
+
 
 @api.get('/healthz/')
 async def healthz():
@@ -42,32 +83,38 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    logger.info(f'user_input: {message.json()}')
+    async with xray_recorder.begin_subsegment('chat') as segment:
+        logger.info(f'user_input: {message.json()}')
+        segment.put_metadata('message', message.json())
 
-    if not message.prompt:
-        return {
-            'status': 'error',
-            'generation': 'Sorry, You must input something.'
-        }
+        if not message.prompt:
+            segment.add_exception(Exception('Sorry, You must input something.'))
+            return {
+                'status': 'error',
+                'generation': 'Sorry, You must input something.'
+            }
 
-    if len(message.prompt) > 180:
-        return {
-            'status': 'error',
-            'generation': 'Sorry, Your input is too long. > 180 characters.'
-        }
+        if len(message.prompt) > 180:
+            segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'))
+            return {
+                'status': 'error',
+                'generation': 'Sorry, Your input is too long. > 180 characters.'
+            }
 
-    try:
-        generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
-        return {
-            'status': 'ok',
-            'generation': generation,
-        }
-    except:
-        logger.exception(traceback.format_exc())
-        return {
-            'status': 'error',
-            'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
-        }
+        try:
+            generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
+            segment.put_metadata('generation', generation)
+            return {
+                'status': 'ok',
+                'generation': generation,
+            }
+        except:
+            logger.exception(traceback.format_exc())
+            segment.add_exception(traceback.format_exc())
+            return {
+                'status': 'error',
+                'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
+            }
 
 
 if __name__ == '__main__':

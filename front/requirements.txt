@@ -4,3 +4,4 @@ uvicorn
 fastapi
 python-dotenv
 requests
+aws-xray-sdk

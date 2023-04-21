@@ -85,7 +85,7 @@ CATEGORIES = '\n'.join([
     '- Quantum Technologies',
     '- Robotics',
     '- Satellite',
-    '- Security, Identity, and Compliance',
+    '- Security and Compliance',
 ])
 
 PROMPT = {
