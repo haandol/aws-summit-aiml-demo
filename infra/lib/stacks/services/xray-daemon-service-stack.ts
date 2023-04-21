@@ -41,7 +41,9 @@ export class XrayDaemonServiceStack extends Stack {
         'public.ecr.aws/xray/aws-xray-daemon:latest'
       ),
       logging,
-      portMappings: [{ containerPort: 2000, protocol: ecs.Protocol.UDP }],
+      portMappings: [
+        { hostPort: 2000, containerPort: 2000, protocol: ecs.Protocol.UDP },
+      ],
       cpu: 32,
       memoryReservationMiB: 256,
       environment: {
