@@ -79,8 +79,9 @@ export class EcsClusterStack extends Stack {
       machineImage: ec2.MachineImage.lookup({
         name: 'amzn2-ami-ecs-gpu-hvm-2.0.20230321-x86_64-ebs',
       }),
-      userData,
+      requireImdsv2: true,
       detailedMonitoring: true,
+      userData,
       securityGroup,
       role,
     });
@@ -107,6 +108,7 @@ export class EcsClusterStack extends Stack {
       ],
       machineImage: ecs.EcsOptimizedImage.amazonLinux2(),
       userData: ec2.UserData.forLinux(),
+      requireImdsv2: true,
       detailedMonitoring: true,
       securityGroup,
       role,
