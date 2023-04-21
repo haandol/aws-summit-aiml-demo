@@ -44,6 +44,9 @@ export class XrayDaemonServiceStack extends Stack {
       portMappings: [{ containerPort: 2000, protocol: ecs.Protocol.UDP }],
       cpu: 32,
       memoryReservationMiB: 256,
+      environment: {
+        AWS_REGION: Stack.of(this).region,
+      },
     });
 
     return taskDefinition;
