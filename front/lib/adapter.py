@@ -80,7 +80,7 @@ class QuestionClassifier(object):
             temperature=0.02,
         )
         logger.info(f'classify generation: {generation}')
-        return 'question' in generation
+        return 'question' in generation.lower()
 
 
 class CategoryClassifier(object):
