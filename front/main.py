@@ -6,12 +6,11 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from aws_xray_sdk.core import xray_recorder, patch_all
 from aws_xray_sdk.core.models import http
-from aws_xray_sdk.core.async_context import AsyncContext
 
 from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
-xray_recorder.configure(service='front', context=AsyncContext())
+xray_recorder.configure(service='front')
 plugins = ('ECSPlugin', 'EC2Plugin')
 rules = {
   "version": 2,
@@ -83,7 +82,7 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    async with xray_recorder.begin_subsegment('chat') as segment:
+    with xray_recorder.begin_subsegment('chat') as segment:
         logger.info(f'user_input: {message.json()}')
         segment.put_metadata('message', message.json())
 
