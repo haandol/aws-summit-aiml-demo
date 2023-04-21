@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as logs from 'aws-cdk-lib/aws-logs';
 
 interface IProps extends StackProps {
@@ -35,20 +36,27 @@ export class XrayDaemonServiceStack extends Stack {
       logGroup: props.taskLogGroup,
       streamPrefix: 'xray',
     });
-    taskDefinition.addContainer(`Container`, {
-      containerName: 'xray-daemon',
+    taskDefinition.addContainer(`OTelContainer`, {
+      containerName: 'aws-otel-collector',
+      hostname: 'aws-otel-collector',
       image: ecs.ContainerImage.fromRegistry(
-        'public.ecr.aws/xray/aws-xray-daemon:latest'
+        'public.ecr.aws/aws-observability/aws-otel-collector'
       ),
-      logging,
+      command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml'],
       portMappings: [
-        { hostPort: 2000, containerPort: 2000, protocol: ecs.Protocol.UDP },
+        { containerPort: 4317, protocol: ecs.Protocol.TCP, hostPort: 4317 },
+        { containerPort: 2000, protocol: ecs.Protocol.UDP, hostPort: 2000 },
       ],
-      cpu: 32,
-      memoryReservationMiB: 256,
-      environment: {
-        AWS_REGION: Stack.of(this).region,
+      secrets: {
+        AWS_REGION: ecs.Secret.fromSsmParameter(
+          new ssm.StringParameter(this, 'EnvAwsRegion', {
+            stringValue: 'ap-northeast-2',
+          })
+        ),
       },
+      logging,
+      cpu: 50,
+      memoryReservationMiB: 128,
     });
 
     return taskDefinition;
