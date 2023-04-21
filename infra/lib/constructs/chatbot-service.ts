@@ -103,8 +103,8 @@ export class ChatbotService extends Construct {
       circuitBreaker: { rollback: true },
       taskDefinition,
       desiredCount: 1,
-      minHealthyPercent: 0,
-      maxHealthyPercent: 100,
+      minHealthyPercent: 50,
+      maxHealthyPercent: 200,
       cloudMapOptions: {
         name: props.service.name.toLowerCase(),
         containerPort: props.service.port,
