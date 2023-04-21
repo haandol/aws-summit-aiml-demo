@@ -94,6 +94,7 @@ async def chat(message: Message):
         segment.close()
         return {
             'status': 'error',
+            'type': 'chat',
             'generation': 'Sorry, You must input something.'
         }
 
@@ -102,15 +103,17 @@ async def chat(message: Message):
         segment.close()
         return {
             'status': 'error',
+            'type': 'chat',
             'generation': 'Sorry, Your input is too long. > 180 characters.'
         }
 
     try:
-        generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
+        kind, generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
         segment.put_metadata('generation', generation)
         segment.close()
         return {
             'status': 'ok',
+            'type': kind,
             'generation': generation,
         }
     except Exception as e:
@@ -119,6 +122,7 @@ async def chat(message: Message):
         segment.close()
         return {
             'status': 'error',
+            'type': 'chat',
             'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
         }
 

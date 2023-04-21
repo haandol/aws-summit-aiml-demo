@@ -142,7 +142,7 @@ class ArchitectureWhisperer(object):
         if not user_input:
             segment.put_metadata('no_input', True)
             segment.close()
-            return 'You must input something.'
+            return 'chat', 'You must input something.'
 
         logger.info(f'user_input: {user_input}')
         segment.put_metadata('user_input', user_input)
@@ -158,14 +158,12 @@ class ArchitectureWhisperer(object):
 
             if category != CATEGORY_UNKNOWN:
                 query = category.lower().replace('.', '')
-                search_result = self.search_adapter.search(q=query)
                 segment.put_metadata('search_query', query)
-                segment.put_metadata('search_count', len(search_result))
                 segment.close()
-                return search_result
+                return 'search', query
 
         generation = self.chat_generator.generate(user_input=user_input, context=context)
         logger.info(f'generation: {generation}')
         segment.put_metadata('chat generation', generation)
         segment.close()
-        return generation
+        return 'chat', generation
