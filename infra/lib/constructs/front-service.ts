@@ -1,7 +1,6 @@
 import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IServiceProps } from '../interfaces/types';
 
 export class FrontService extends Construct {
@@ -34,7 +33,7 @@ export class FrontService extends Construct {
       logGroup: props.taskLogGroup,
       streamPrefix: props.service.name,
     });
-    const serviceContainer = taskDefinition.addContainer(`ServiceContainer`, {
+    taskDefinition.addContainer(`ServiceContainer`, {
       containerName: props.service.name.toLowerCase(),
       image: ecs.ContainerImage.fromEcrRepository(
         serviceRepository,
@@ -51,19 +50,9 @@ export class FrontService extends Construct {
         { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
       ],
       secrets: props.taskEnvs,
+      cpu: 256,
       memoryReservationMiB: 256,
     });
-    const xrayContainer = taskDefinition.addContainer(`XrayContainer`, {
-      containerName: 'xray-daemon',
-      image: ecs.ContainerImage.fromRegistry(
-        'public.ecr.aws/xray/aws-xray-daemon:latest'
-      ),
-      portMappings: [{ containerPort: 2000, protocol: ecs.Protocol.UDP }],
-      cpu: 32,
-      memoryReservationMiB: 256,
-    });
-    serviceContainer.addLink(xrayContainer);
-
     return taskDefinition;
   }
 

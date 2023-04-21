@@ -11,7 +11,7 @@ from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
 xray_recorder.configure(service='front')
-plugins = ('ECSPlugin', 'EC2Plugin')
+plugins = ('ECSPlugin',)
 rules = {
   "version": 2,
   "rules": [
@@ -82,38 +82,42 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    with xray_recorder.begin_subsegment('chat') as segment:
-        logger.info(f'user_input: {message.json()}')
-        segment.put_metadata('message', message.json())
+    segment = xray_recorder.begin_subsegment('chat')
+    logger.info(f'user_input: {message.json()}')
+    segment.put_metadata('message', message.json())
 
-        if not message.prompt:
-            segment.add_exception(Exception('Sorry, You must input something.'))
-            return {
-                'status': 'error',
-                'generation': 'Sorry, You must input something.'
-            }
+    if not message.prompt:
+        segment.add_exception(Exception('Sorry, You must input something.'))
+        segment.close()
+        return {
+            'status': 'error',
+            'generation': 'Sorry, You must input something.'
+        }
 
-        if len(message.prompt) > 180:
-            segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'))
-            return {
-                'status': 'error',
-                'generation': 'Sorry, Your input is too long. > 180 characters.'
-            }
+    if len(message.prompt) > 180:
+        segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'))
+        segment.close()
+        return {
+            'status': 'error',
+            'generation': 'Sorry, Your input is too long. > 180 characters.'
+        }
 
-        try:
-            generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
-            segment.put_metadata('generation', generation)
-            return {
-                'status': 'ok',
-                'generation': generation,
-            }
-        except:
-            logger.exception(traceback.format_exc())
-            segment.add_exception(traceback.format_exc())
-            return {
-                'status': 'error',
-                'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
-            }
+    try:
+        generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
+        segment.put_metadata('generation', generation)
+        segment.close()
+        return {
+            'status': 'ok',
+            'generation': generation,
+        }
+    except:
+        logger.exception(traceback.format_exc())
+        segment.add_exception(traceback.format_exc())
+        segment.close()
+        return {
+            'status': 'error',
+            'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
+        }
 
 
 if __name__ == '__main__':

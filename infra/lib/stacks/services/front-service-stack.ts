@@ -24,7 +24,7 @@ export class FrontServiceStack extends Stack {
       ),
       AWS_XRAY_DAEMON_ADDRESS: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvXrayDaemon', {
-          stringValue: `xray-daemon:2000`,
+          stringValue: `xray-daemon.chatbotdemodev:2000`,
         })
       ),
     };

@@ -6,6 +6,7 @@ import { EcsClusterStack } from '../lib/stacks/ecs-cluster-stack';
 import { EfsStack } from '../lib/stacks/efs-stack';
 import { FrontServiceStack } from '../lib/stacks/services/front-service-stack';
 import { ChatbotServiceStack } from '../lib/stacks/services/chatbot-service-stack';
+import { XrayDaemonServiceStack } from '../lib/stacks/services/xray-daemon-service-stack';
 import { Config } from '../config/loader';
 
 const app = new cdk.App({
@@ -45,6 +46,23 @@ const ecsClusterStack = new EcsClusterStack(
 );
 ecsClusterStack.addDependency(vpcStack);
 
+const xrayDaemonServiceStack = new XrayDaemonServiceStack(
+  app,
+  `${Config.app.ns}XrayDaemonServiceStack`,
+  {
+    cluster: ecsClusterStack.cluster,
+    taskRole: ecsClusterStack.taskRole,
+    taskLogGroup: ecsClusterStack.taskLogGroup,
+    taskExecutionRole: ecsClusterStack.taskExecutionRole,
+    taskSecurityGroup: ecsClusterStack.taskSecurityGroup,
+    env: {
+      account: Config.aws.account,
+      region: Config.aws.region,
+    },
+  }
+);
+xrayDaemonServiceStack.addDependency(ecsClusterStack);
+
 const frontServiceStack = new FrontServiceStack(
   app,
   `${Config.app.ns}FrontServiceStack`,
@@ -70,6 +88,7 @@ const frontServiceStack = new FrontServiceStack(
 );
 frontServiceStack.addDependency(ecsClusterStack);
 
+/*
 const chatbotServiceStack = new ChatbotServiceStack(
   app,
   `${Config.app.ns}ChatbotServiceStack`,
@@ -95,6 +114,7 @@ const chatbotServiceStack = new ChatbotServiceStack(
 );
 chatbotServiceStack.addDependency(efsStack);
 chatbotServiceStack.addDependency(ecsClusterStack);
+*/
 
 const tags = cdk.Tags.of(app);
 tags.add('namespace', Config.app.ns);
