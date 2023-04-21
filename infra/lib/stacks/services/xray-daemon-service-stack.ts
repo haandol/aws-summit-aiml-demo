@@ -56,10 +56,6 @@ export class XrayDaemonServiceStack extends Stack {
       circuitBreaker: { rollback: true },
       taskDefinition,
       daemon: true,
-      cloudMapOptions: {
-        name: 'xray-daemon',
-        containerPort: 2000,
-      },
     });
     return service;
   }
