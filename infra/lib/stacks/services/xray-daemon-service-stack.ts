@@ -45,7 +45,6 @@ export class XrayDaemonServiceStack extends Stack {
       command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml'],
       portMappings: [
         { containerPort: 4317, protocol: ecs.Protocol.TCP, hostPort: 4317 },
-        { containerPort: 2000, protocol: ecs.Protocol.UDP, hostPort: 2000 },
       ],
       secrets: {
         AWS_REGION: ecs.Secret.fromSsmParameter(

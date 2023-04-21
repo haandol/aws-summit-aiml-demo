@@ -1,6 +1,7 @@
 import requests
-from aws_xray_sdk.core import xray_recorder
+from opentelemetry import trace
 
+from .o11y import tracer
 from .logger import logger
 from .prompt import PROMPT, CATEGORIES, CATEGORY_UNKNOWN
 
@@ -138,29 +139,32 @@ class ArchitectureWhisperer(object):
         self.chat_generator = ChatGenerator(chatbot_adapter)
 
     def orchestrate(self, user_input: str, context: str = ''):
-        with xray_recorder.in_subsegment('orchestrate') as segment:
+        with tracer.start_as_current_span('orchestrate') as span:
+            span.set_attribute('type', 'chat')
+
             if not user_input:
-                segment.put_metadata('no_input', True)
+                span.set_attribute('no_input', True)
                 return 'chat', 'You must input something.'
 
             logger.info(f'user_input: {user_input}')
-            segment.put_metadata('user_input', user_input)
+            span.set_attribute('user_input', user_input)
 
             is_question = self.question_classifier.classify(user_input)
             logger.info(f'is_question: {is_question}')
-            segment.put_annotation('is_question', is_question)
+            span.set_attribute('is_question', is_question)
 
             if is_question:
                 category = self.category_classifier.classify(user_input)
                 logger.info(f'category: {category}')
-                segment.put_annotation('category', category)
+                span.set_attribute('category', category)
 
                 if category != CATEGORY_UNKNOWN:
                     query = category.lower().replace('.', '')
-                    segment.put_metadata('search_query', query)
+                    span.set_attribute('type', 'search')
+                    span.set_attribute('query', query)
                     return 'search', query
 
             generation = self.chat_generator.generate(user_input=user_input, context=context)
             logger.info(f'generation: {generation}')
-            segment.put_metadata('chat generation', generation)
+            span.set_attribute('chat generation', generation)
             return 'chat', generation

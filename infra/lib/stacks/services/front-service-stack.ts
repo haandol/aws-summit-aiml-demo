@@ -22,9 +22,9 @@ export class FrontServiceStack extends Stack {
           stringValue: `http://chatbot.chatbotdemodev:8080/v1/chat/`,
         })
       ),
-      AWS_XRAY_DAEMON_ADDRESS: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvXrayDaemon', {
-          stringValue: `172.17.0.1:2000`,
+      OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvOtelDaemon', {
+          stringValue: `172.17.0.1:4317`,
         })
       ),
     };

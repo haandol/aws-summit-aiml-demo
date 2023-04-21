@@ -1,18 +1,18 @@
 version: '3'
 services:
-  xray:
-    platform: linux/amd64
-    image: public.ecr.aws/xray/aws-xray-daemon:alpha
+  aws-otel-collector:
+    image: amazon/aws-otel-collector:latest
+    volumes:
+      - ~/.aws:/root/.aws
+    ports:
+      - '4317:4317' # OTLP receiver
     environment:
       - AWS_REGION=ap-northeast-2
-    volumes:
-      - ~/.aws/:/root/.aws/:ro
-    ports:
-      - 2000:2000
+    command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml']
   front:
     platform: linux/amd64
-    image: front:805585d7c2
+    image: front:aeec25fef6
     environment:
-      - AWS_XRAY_DAEMON_ADDRESS=xray:2000
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-otel-collector:4317
     ports:
       - 8090:8080
