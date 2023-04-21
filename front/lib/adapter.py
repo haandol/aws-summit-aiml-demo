@@ -166,6 +166,6 @@ class ArchitectureWhisperer(object):
 
         generation = self.chat_generator.generate(user_input=user_input, context=context)
         logger.info(f'generation: {generation}')
-        segment.put_metadata('chat generation', query)
+        segment.put_metadata('chat generation', generation)
         segment.close()
         return generation
