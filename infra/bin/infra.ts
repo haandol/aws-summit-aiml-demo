@@ -88,7 +88,6 @@ const frontServiceStack = new FrontServiceStack(
 );
 frontServiceStack.addDependency(ecsClusterStack);
 
-/*
 const chatbotServiceStack = new ChatbotServiceStack(
   app,
   `${Config.app.ns}ChatbotServiceStack`,
@@ -114,7 +113,6 @@ const chatbotServiceStack = new ChatbotServiceStack(
 );
 chatbotServiceStack.addDependency(efsStack);
 chatbotServiceStack.addDependency(ecsClusterStack);
-*/
 
 const tags = cdk.Tags.of(app);
 tags.add('namespace', Config.app.ns);
