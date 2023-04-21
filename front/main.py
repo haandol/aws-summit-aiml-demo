@@ -31,7 +31,7 @@ rules = {
 }
 xray_recorder.configure(
     service='front', plugins=plugins,
-    sampler=LocalSampler(), sampling_rules=rules
+    sampler=LocalSampler(rules=rules),
 )
 patch_all()
 load_dotenv()
