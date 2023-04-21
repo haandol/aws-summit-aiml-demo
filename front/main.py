@@ -11,11 +11,11 @@ from aws_xray_sdk.core.models import http
 from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
-plugins = ('ECSPlugin',)
 xray_recorder.configure(
     sampling=False,
     service='front',
-    plugins=plugins,
+    plugins=('ECSPlugin',),
+    daemon_address=os.environ.get('AWS_XRAY_DAEMON_ADDRESS', '0.0.0.0:2000'),
 )
 patch_all()
 load_dotenv()
@@ -51,7 +51,6 @@ async def init_xray_segment(request: Request, call_next):
     segment.put_http_meta(http.URL, str(request.url))
     segment.put_http_meta(http.USER_AGENT, request.headers.get('User-Agent'))
     segment.put_http_meta(http.X_FORWARDED_FOR, request.headers.get('X-Forwarded-For'))
-    segment.put_http_meta(http.XRAY_HEADER, segment.trace_id)
     segment.put_http_meta(http.METHOD, request.method)
 
     response: Response = await call_next(request)
