@@ -117,6 +117,17 @@ export class ChatbotService extends Construct {
       ],
     });
 
+    const scalableTarget = service.autoScaleTaskCount({
+      minCapacity: 1,
+      maxCapacity: 6,
+    });
+    scalableTarget.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 70,
+    });
+    scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
+      targetUtilizationPercent: 70,
+    });
+
     return service;
   }
 }

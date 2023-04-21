@@ -80,7 +80,7 @@ export class FrontService extends Construct {
 
     const scalableTarget = service.autoScaleTaskCount({
       minCapacity: 1,
-      maxCapacity: 3,
+      maxCapacity: 15,
     });
     scalableTarget.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 70,

@@ -264,7 +264,7 @@ export class EcsClusterStack extends Stack {
       vpc: cluster.vpc,
       minCapacity: 1,
       desiredCapacity: 1,
-      maxCapacity: 2,
+      maxCapacity: 3,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
@@ -280,7 +280,7 @@ export class EcsClusterStack extends Stack {
       vpc: cluster.vpc,
       minCapacity: 1,
       desiredCapacity: 1,
-      maxCapacity: 2,
+      maxCapacity: 5,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
