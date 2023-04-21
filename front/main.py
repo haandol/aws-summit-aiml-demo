@@ -11,7 +11,6 @@ from aws_xray_sdk.core.models import http
 from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
-xray_recorder.configure(service='front', sampler=LocalSampler())
 plugins = ('ECSPlugin',)
 rules = {
   "version": 2,
@@ -30,7 +29,10 @@ rules = {
     "rate": 1.0
   }
 }
-xray_recorder.configure(plugins=plugins, sampling_rules=rules)
+xray_recorder.configure(
+    service='front', plugins=plugins,
+    sampler=LocalSampler(), sampling_rules=rules
+)
 patch_all()
 load_dotenv()
 
