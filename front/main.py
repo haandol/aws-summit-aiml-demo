@@ -12,26 +12,10 @@ from lib.logger import logger
 from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
 
 plugins = ('ECSPlugin',)
-rules = {
-  "version": 2,
-  "rules": [
-    {
-      "description": "health check",
-      "host": "*",
-      "http_method": "GET",
-      "url_path": "/healthz",
-      "fixed_target": 0,
-      "rate": 0.0
-    }
-  ],
-  "default": {
-    "fixed_target": 1,
-    "rate": 1.0
-  }
-}
 xray_recorder.configure(
-    service='front', plugins=plugins,
-    sampler=LocalSampler(rules=rules),
+    sampling=False,
+    service='front',
+    plugins=plugins,
 )
 patch_all()
 load_dotenv()
@@ -72,7 +56,7 @@ async def init_xray_segment(request: Request, call_next):
 
     response: Response = await call_next(request)
     segment.put_http_meta(http.STATUS, response.status_code)
-    segment.close()
+    xray_recorder.end_segment()
     return response
 
 
@@ -85,46 +69,42 @@ async def healthz():
 
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    segment = xray_recorder.begin_subsegment('chat')
-    logger.info(f'user_input: {message.json()}')
-    segment.put_metadata('message', message.json())
+    with xray_recorder.in_subsegment('chat') as segment:
+        logger.info(f'user_input: {message.json()}')
+        segment.put_metadata('message', message.json())
 
-    if not message.prompt:
-        segment.add_exception(Exception('Sorry, You must input something.'), None)
-        segment.close()
-        return {
-            'status': 'error',
-            'type': 'chat',
-            'generation': 'Sorry, You must input something.'
-        }
+        if not message.prompt:
+            segment.add_exception(Exception('Sorry, You must input something.'), None)
+            return {
+                'status': 'error',
+                'type': 'chat',
+                'generation': 'Sorry, You must input something.'
+            }
 
-    if len(message.prompt) > 180:
-        segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'), None)
-        segment.close()
-        return {
-            'status': 'error',
-            'type': 'chat',
-            'generation': 'Sorry, Your input is too long. > 180 characters.'
-        }
+        if len(message.prompt) > 180:
+            segment.add_exception(Exception('Sorry, Your input is too long. > 180 characters.'), None)
+            return {
+                'status': 'error',
+                'type': 'chat',
+                'generation': 'Sorry, Your input is too long. > 180 characters.'
+            }
 
-    try:
-        kind, generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
-        segment.put_metadata('generation', generation)
-        segment.close()
-        return {
-            'status': 'ok',
-            'type': kind,
-            'generation': generation,
-        }
-    except Exception as e:
-        logger.exception(traceback.format_exc())
-        segment.add_exception(e, traceback.extract_stack())
-        segment.close()
-        return {
-            'status': 'error',
-            'type': 'chat',
-            'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
-        }
+        try:
+            kind, generation = whisperer.orchestrate(user_input=message.prompt, context=message.context)
+            segment.put_metadata('generation', generation)
+            return {
+                'status': 'ok',
+                'type': kind,
+                'generation': generation,
+            }
+        except Exception as e:
+            logger.exception(traceback.format_exc())
+            segment.add_exception(e, traceback.extract_stack())
+            return {
+                'status': 'error',
+                'type': 'chat',
+                'generation': 'Sorry, it might be an internal error. I am calling my supervisor to fix it.'
+            }
 
 
 if __name__ == '__main__':

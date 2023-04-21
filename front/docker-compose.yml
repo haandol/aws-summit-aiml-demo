@@ -1,12 +1,18 @@
 version: '3'
 services:
+  xray:
+    platform: linux/amd64
+    image: public.ecr.aws/xray/aws-xray-daemon:alpha
+    environment:
+      - AWS_REGION=ap-northeast-2
+    volumes:
+      - ~/.aws/:/root/.aws/:ro
+    ports:
+      - 2000:2000
   front:
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
+    platform: linux/amd64
+    image: front:805585d7c2
+    environment:
+      - AWS_XRAY_DAEMON_ADDRESS=xray:2000
     ports:
       - 8090:8080

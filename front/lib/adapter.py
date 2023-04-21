@@ -138,32 +138,29 @@ class ArchitectureWhisperer(object):
         self.chat_generator = ChatGenerator(chatbot_adapter)
 
     def orchestrate(self, user_input: str, context: str = ''):
-        segment = xray_recorder.begin_subsegment('orchestrate')
-        if not user_input:
-            segment.put_metadata('no_input', True)
-            segment.close()
-            return 'chat', 'You must input something.'
+        with xray_recorder.in_subsegment('orchestrate') as segment:
+            if not user_input:
+                segment.put_metadata('no_input', True)
+                return 'chat', 'You must input something.'
 
-        logger.info(f'user_input: {user_input}')
-        segment.put_metadata('user_input', user_input)
+            logger.info(f'user_input: {user_input}')
+            segment.put_metadata('user_input', user_input)
 
-        is_question = self.question_classifier.classify(user_input)
-        logger.info(f'is_question: {is_question}')
-        segment.put_annotation('is_question', is_question)
+            is_question = self.question_classifier.classify(user_input)
+            logger.info(f'is_question: {is_question}')
+            segment.put_annotation('is_question', is_question)
 
-        if is_question:
-            category = self.category_classifier.classify(user_input)
-            logger.info(f'category: {category}')
-            segment.put_annotation('category', category)
+            if is_question:
+                category = self.category_classifier.classify(user_input)
+                logger.info(f'category: {category}')
+                segment.put_annotation('category', category)
 
-            if category != CATEGORY_UNKNOWN:
-                query = category.lower().replace('.', '')
-                segment.put_metadata('search_query', query)
-                segment.close()
-                return 'search', query
+                if category != CATEGORY_UNKNOWN:
+                    query = category.lower().replace('.', '')
+                    segment.put_metadata('search_query', query)
+                    return 'search', query
 
-        generation = self.chat_generator.generate(user_input=user_input, context=context)
-        logger.info(f'generation: {generation}')
-        segment.put_metadata('chat generation', generation)
-        segment.close()
-        return 'chat', generation
+            generation = self.chat_generator.generate(user_input=user_input, context=context)
+            logger.info(f'generation: {generation}')
+            segment.put_metadata('chat generation', generation)
+            return 'chat', generation
