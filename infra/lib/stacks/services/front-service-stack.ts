@@ -24,7 +24,7 @@ export class FrontServiceStack extends Stack {
       ),
       OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvOtelDaemon', {
-          stringValue: `172.17.0.1:4317`,
+          stringValue: `http://172.17.0.1:4317`,
         })
       ),
     };
