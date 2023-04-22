@@ -27,7 +27,7 @@ class ChatbotAdapter(object):
                 'temperature': temperature,
                 'do_sample': do_sample,
             }
-            span.set_attribute('body', body)
+            span.set_attribute('adapter.body', body)
 
             headers = {}
             span_context = span.get_span_context()
@@ -40,7 +40,7 @@ class ChatbotAdapter(object):
 
             data = resp.json()
             logger.info(f'resp: {data}')
-            span.set_attribute('resp', data)
+            span.set_attribute('adapter.response', data)
             if data['status'] == 'error':
                 exc = Exception('failed to generate text..')
                 span.record_exception(exc)

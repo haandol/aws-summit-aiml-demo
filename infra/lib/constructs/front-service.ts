@@ -65,7 +65,7 @@ export class FrontService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 2,
+      desiredCount: 3,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {

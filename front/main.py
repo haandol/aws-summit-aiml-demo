@@ -108,7 +108,7 @@ async def chat(message: Message):
         except Exception as exc:
             logger.exception(traceback.format_exc())
             span.record_exception(exc)
-            span.set_attribute('traceback', traceback.format_exc())
+            span.set_attribute('error.traceback', traceback.format_exc())
             span.set_status(trace.Status(trace.StatusCode.ERROR))
             return JSONResponse(content={
                 'status': 'error',
