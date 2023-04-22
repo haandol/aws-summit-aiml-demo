@@ -110,6 +110,7 @@ export class ChatbotService extends Construct {
         containerPort: props.service.port,
       },
       securityGroups: [props.taskSecurityGroup],
+      placementStrategies: [ecs.PlacementStrategy.spreadAcrossInstances()],
       placementConstraints: [
         ecs.PlacementConstraint.memberOf(
           'attribute:ecs.instance-type =~ g4dn.*'
