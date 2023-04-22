@@ -111,9 +111,7 @@ export class ChatbotService extends Construct {
       },
       securityGroups: [props.taskSecurityGroup],
       placementConstraints: [
-        ecs.PlacementConstraint.memberOf(
-          'attribute:ecs.instance-type =~ g4dn.*'
-        ),
+        ecs.PlacementConstraint.memberOf('attribute:ecs.instance-type =~ p3.*'),
       ],
     });
 
