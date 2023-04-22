@@ -81,7 +81,7 @@ export class ChatbotService extends Construct {
       portMappings: [
         { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
       ],
-      memoryReservationMiB: 1024 * 16,
+      memoryReservationMiB: 1024 * 24,
       secrets: props.taskEnvs,
     });
     serviceContainer.addMountPoints({
@@ -102,7 +102,7 @@ export class ChatbotService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 1,
+      desiredCount: 2,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {
@@ -119,7 +119,7 @@ export class ChatbotService extends Construct {
 
     const scalableTarget = service.autoScaleTaskCount({
       minCapacity: 1,
-      maxCapacity: 6,
+      maxCapacity: 3,
     });
     scalableTarget.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 70,
