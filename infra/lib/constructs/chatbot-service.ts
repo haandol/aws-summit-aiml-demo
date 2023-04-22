@@ -102,7 +102,7 @@ export class ChatbotService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 2,
+      desiredCount: 3,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {
@@ -110,7 +110,6 @@ export class ChatbotService extends Construct {
         containerPort: props.service.port,
       },
       securityGroups: [props.taskSecurityGroup],
-      placementStrategies: [ecs.PlacementStrategy.spreadAcrossInstances()],
       placementConstraints: [
         ecs.PlacementConstraint.memberOf(
           'attribute:ecs.instance-type =~ g4dn.*'

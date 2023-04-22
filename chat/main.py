@@ -1,5 +1,6 @@
 import os
 import traceback
+import threading
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -9,6 +10,28 @@ from lib.logger import logger
 from lib import chatbot
 
 load_dotenv()
+
+model_name = os.environ['MODEL_NAME']
+cache_dir= os.environ['CACHE_DIR']
+load_in_8bit= bool(os.environ.get('LOAD_IN_8BIT', False))
+logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir} and load_in_8bit: {load_in_8bit}')
+
+model, tokenizer, is_ready = None, None, False
+
+api = FastAPI()
+
+
+class BackgroundModelLoader(threading.Thread):
+    def run(self, *args, **kwargs):
+        global model, tokenizer, is_ready
+        logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir}')
+        tokenizer, model = chatbot.setup_model(
+            model_name=model_name,
+            cache_dir=cache_dir,
+            load_in_8bit=load_in_8bit,
+        )
+        logger.info('Model loaded')
+        is_ready = True
 
 
 class Message(BaseModel):
@@ -30,19 +53,10 @@ class Message(BaseModel):
     )
 
 
-api = FastAPI()
-
-model_name = os.environ['MODEL_NAME']
-cache_dir= os.environ['CACHE_DIR']
-load_in_8bit= bool(os.environ.get('LOAD_IN_8BIT', False))
-
-logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir}')
-tokenizer, model = chatbot.setup_model(
-    model_name=model_name,
-    cache_dir=cache_dir,
-    load_in_8bit=load_in_8bit,
-)
-logger.info('Model loaded')
+@api.on_event('startup')
+async def startup_event():
+    t = BackgroundModelLoader()
+    t.start()
 
 
 @api.get('/healthz')
@@ -53,11 +67,22 @@ async def healthz():
     }
 
 
+@api.get('/readyz')
+@api.get('/readyz/')
+async def readyz():
+    return {
+        'status': is_ready,
+    }
+
+
 @api.post('/v1/chat')
 @api.post('/v1/chat/')
 async def chat(message: Message):
-    global tokenizer
-    global model
+    if not is_ready:
+        return {
+            'status': 'error',
+            'generation': 'the model is not ready yet',
+        }
 
     logger.info(message)
     try:
