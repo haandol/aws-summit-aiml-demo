@@ -48,33 +48,3 @@ class ChatbotAdapter(object):
                 raise exc
 
             return data['generation']
-
-
-class SearchAdapter(object):
-    def __init__(self, endpoint: str) -> None:
-        self._endpoint = endpoint
-    
-    def search(self, q: str) -> str:
-        logger.info(f'q: {q}')
-        resp = requests.get(self._endpoint, params={'q': q}, timeout=10)
-        if resp.status_code != 200:
-            raise Exception('failed to request to search server..')
-
-        lines = []
-        for article in resp.json():
-            title = article['title']
-            link = article['link']
-            lines.append(f'<li><a href="{link}" target="_blank">{title}</a></li>')
-        logger.info(f'lines: {lines}') 
-        if lines:
-            articles = ''.join(lines)
-            return f'''
-            <div>
-                <p>Here are some articles I found about {q}:</p>
-                <ul class="articles">
-                    {articles}
-                </ul>
-            </div>
-            '''.strip()
-        else:
-            return '''<p>No articles found.</p>'''

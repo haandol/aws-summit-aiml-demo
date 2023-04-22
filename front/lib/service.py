@@ -1,6 +1,6 @@
 from .o11y import tracer
 from .logger import logger
-from .adapter import ChatbotAdapter, SearchAdapter
+from .adapter import ChatbotAdapter
 from .prompt import PROMPT, CATEGORIES, CATEGORY_UNKNOWN
 
 
@@ -67,9 +67,7 @@ class ChatGenerator(object):
 class ArchitectureWhisperer(object):
     def __init__(self,
         chatbot_adapter: ChatbotAdapter,
-        search_adapter: SearchAdapter,
     ) -> None:
-        self.search_adapter = search_adapter
         self.question_classifier = QuestionClassifier(chatbot_adapter)
         self.category_classifier = CategoryClassifier(chatbot_adapter)
         self.chat_generator = ChatGenerator(chatbot_adapter)

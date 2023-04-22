@@ -9,18 +9,16 @@ from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from lib.logger import logger
-from lib.adapter import ChatbotAdapter, SearchAdapter
+from lib.adapter import ChatbotAdapter
 from lib.service import ArchitectureWhisperer
 from lib.o11y import tracer, context_from_headers
 
 load_dotenv()
-SEARCH_ENDPOINT = os.environ['SEARCH_ENDPOINT']
 CHAT_ENDPOINT = os.environ['CHAT_ENDPOINT']
-logger.info(f'CHAT_ENDPOINT: {CHAT_ENDPOINT} and SEARCH_ENDPOINT: {SEARCH_ENDPOINT}')
+logger.info(f'CHAT_ENDPOINT: {CHAT_ENDPOINT}')
 
 whisperer = ArchitectureWhisperer(
     chatbot_adapter=ChatbotAdapter(CHAT_ENDPOINT),
-    search_adapter=SearchAdapter(SEARCH_ENDPOINT),
 )
 
 api = FastAPI()
