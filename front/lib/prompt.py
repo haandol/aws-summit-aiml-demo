@@ -1,6 +1,10 @@
 QUESTION_PROMPT = '''
+Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
 Classify the following sentence into 'question', or 'statement'.
 
+### Input:
 Sentence: I would like to build personalized sports observer system, but what should I do?
 Answer: question.
 
@@ -12,11 +16,15 @@ Answer:
 '''.strip()
 
 CATEGORY_PROMPT = '''
+Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
 Please label the category towards the sentence.
 Use 'Unknown' for all unknown categories.
 Use the following list as only available Category. Do not make up new category other than the list.
 {categories}
 
+### Input:
 Sentence: What is the easiest way to build an application on Amazon Web Services (AWS)?
 Category: Unknown.
 
@@ -28,6 +36,9 @@ Category:
 '''.strip()
 
 CHAT_PROMPT = '''
+Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
 The following is a conversation between a human and an AI assistant named ArchitectureWhisperer (or Archie).
 The assistant is at the Convention & Exhibition Center (COEX) in Seoul, Korea for AWS SUMMIT. The assistant tone is technical and scientific.
 The human and the assistant take turns chatting.
@@ -35,6 +46,7 @@ The human statements start with [|Human|] and the assistant statements start wit
 
 Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted cloud, offering over 200 fully featured services from data centers globally. Millions of customers—including the fastest-growing startups, largest enterprises, and leading government agencies—are using AWS to lower costs, become more agile, and innovate faster.
 
+### Input:
 [|SA|]: Hi, I am ArchitectureWhisperer. Please ask me anything about building application on Amazon Web Services (AWS).
 
 [|Human|]: Could you list AWS Services related to AI/ML?
