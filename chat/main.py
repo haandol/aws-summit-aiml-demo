@@ -17,7 +17,7 @@ load_dotenv()
 model_name = os.environ['MODEL_NAME']
 cache_dir= os.environ['CACHE_DIR']
 load_in_8bit= bool(os.environ.get('LOAD_IN_8BIT', False))
-logger.info(f'Loading model: {model_name} with cache_dir: {cache_dir} and load_in_8bit: {load_in_8bit}')
+logger.info(f'model_name: {model_name}, cache_dir: {cache_dir}, load_in_8bit: {load_in_8bit}')
 
 model, tokenizer, is_ready = None, None, False
 
