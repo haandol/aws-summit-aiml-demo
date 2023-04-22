@@ -130,6 +130,7 @@ async def chat(message: Message):
                 temperature=message.temperature,
                 do_sample=message.do_sample,
             )
+            span.set_attribute('generation', generation)
             return JSONResponse(content={
                 'status': 'ok',
                 'generation': generation,
