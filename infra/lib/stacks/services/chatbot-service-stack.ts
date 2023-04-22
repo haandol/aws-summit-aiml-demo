@@ -20,6 +20,11 @@ export class ChatbotServiceStack extends Stack {
           stringValue: 'all',
         })
       ),
+      OTEL_SERVICE_NAME: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvOtelService', {
+          stringValue: `chatbot`,
+        })
+      ),
       OTEL_EXPORTER_OTLP_ENDPOINT: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvOtelDaemon', {
           stringValue: `http://otel.chatbotdemodev:4317`,
