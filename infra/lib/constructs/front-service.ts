@@ -65,7 +65,7 @@ export class FrontService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 3,
+      desiredCount: 2,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {
@@ -73,13 +73,14 @@ export class FrontService extends Construct {
         containerPort: props.service.port,
       },
       securityGroups: [props.taskSecurityGroup],
+      placementStrategies: [ecs.PlacementStrategy.packedByCpu()],
       placementConstraints: [
         ecs.PlacementConstraint.memberOf('attribute:ecs.instance-type =~ m5.*'),
       ],
     });
 
     const scalableTarget = service.autoScaleTaskCount({
-      minCapacity: 1,
+      minCapacity: 2,
       maxCapacity: 9,
     });
     scalableTarget.scaleOnCpuUtilization('CpuScaling', {

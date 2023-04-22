@@ -81,7 +81,7 @@ export class ChatbotService extends Construct {
       portMappings: [
         { containerPort: props.service.port, protocol: ecs.Protocol.TCP },
       ],
-      memoryReservationMiB: 1024 * 24,
+      memoryReservationMiB: 1024 * 12,
       secrets: props.taskEnvs,
     });
     serviceContainer.addMountPoints({
