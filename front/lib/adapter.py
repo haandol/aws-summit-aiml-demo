@@ -1,3 +1,4 @@
+import json
 import requests
 
 from opentelemetry import trace
@@ -27,12 +28,12 @@ class ChatbotAdapter(object):
                 'temperature': temperature,
                 'do_sample': do_sample,
             }
-            span.set_attribute('adapter.body', body)
+            span.set_attribute('body', json.dumps(body))
 
             headers = {}
             span_context = span.get_span_context()
             if span_context.is_valid:
-                headers['X-Amzn-Trace-Id'] = f'Root={span_context.trace_id};Parent={span_context.span_id};Sampled=1',
+                headers['X-Amzn-Trace-Id'] = f'Root={span_context.trace_id};Parent={span_context.span_id};Sampled=1'
 
             resp = requests.post(self._endpoint, json=body, headers=headers, timeout=30)
             if resp.status_code != 200:
@@ -40,7 +41,7 @@ class ChatbotAdapter(object):
 
             data = resp.json()
             logger.info(f'resp: {data}')
-            span.set_attribute('adapter.response', data)
+            span.set_attribute('response', json.dumps(data))
             if data['status'] == 'error':
                 exc = Exception('failed to generate text..')
                 span.record_exception(exc)
