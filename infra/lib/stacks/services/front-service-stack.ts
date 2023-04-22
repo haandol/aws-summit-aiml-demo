@@ -17,11 +17,6 @@ export class FrontServiceStack extends Stack {
     super(scope, id, props);
 
     const taskEnvs = {
-      CHAT_ENDPOINT: ecs.Secret.fromSsmParameter(
-        new ssm.StringParameter(this, 'EnvChatEndpoint', {
-          stringValue: `http://chatbot.chatbotdemodev:8080/v1/chat/`,
-        })
-      ),
       OTEL_SERVICE_NAME: ecs.Secret.fromSsmParameter(
         new ssm.StringParameter(this, 'EnvOtelService', {
           stringValue: `front`,
