@@ -10,8 +10,13 @@ services:
       - AWS_REGION=ap-northeast-2
     command: ['--config=/etc/ecs/ecs-cloudwatch-xray.yaml']
   front:
-    platform: linux/amd64
-    image: front:2bbb82ef9d
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-otel-collector:4317
       - OTEL_SERVICE_NAME=front
