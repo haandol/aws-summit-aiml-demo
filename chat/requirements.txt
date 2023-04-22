@@ -4,6 +4,21 @@ fastapi==0.95.1
 python-dotenv==1.0.0
 python-json-logger==2.0.7
 protobuf==3.20.3
+opentelemetry-api==1.11.1
+opentelemetry-exporter-otlp==1.11.1
+opentelemetry-exporter-otlp-proto-grpc==1.11.1
+opentelemetry-exporter-otlp-proto-http==1.11.1
+opentelemetry-instrumentation==0.30b1
+opentelemetry-instrumentation-asgi==0.30b1
+opentelemetry-instrumentation-botocore==0.30b1
+opentelemetry-instrumentation-fastapi==0.30b1
+opentelemetry-instrumentation-requests==0.30b1
+opentelemetry-propagator-aws-xray==1.0.1
+opentelemetry-proto==1.11.1
+opentelemetry-sdk==1.11.1
+opentelemetry-sdk-extension-aws==2.0.1
+opentelemetry-semantic-conventions==0.30b1
+opentelemetry-util-http==0.30b1
 
 git+https://github.com/huggingface/transformers.git
 git+https://github.com/huggingface/peft.git

@@ -9,10 +9,22 @@ from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from lib.logger import logger
-from lib.adapter import ChatbotAdapter, SearchAdapter, ArchitectureWhisperer
-from lib.o11y import tracer
+from lib.adapter import ChatbotAdapter, SearchAdapter
+from lib.service import ArchitectureWhisperer
+from lib.o11y import tracer, context_from_headers
 
 load_dotenv()
+SEARCH_ENDPOINT = os.environ['SEARCH_ENDPOINT']
+CHAT_ENDPOINT = os.environ['CHAT_ENDPOINT']
+logger.info(f'CHAT_ENDPOINT: {CHAT_ENDPOINT} and SEARCH_ENDPOINT: {SEARCH_ENDPOINT}')
+
+whisperer = ArchitectureWhisperer(
+    chatbot_adapter=ChatbotAdapter(CHAT_ENDPOINT),
+    search_adapter=SearchAdapter(SEARCH_ENDPOINT),
+)
+
+api = FastAPI()
+FastAPIInstrumentor.instrument_app(api, excluded_urls="healthz/")
 
 
 class Message(BaseModel):
@@ -24,26 +36,13 @@ class Message(BaseModel):
     )
 
 
-SEARCH_ENDPOINT = os.environ['SEARCH_ENDPOINT']
-logger.info(f'SEARCH_ENDPOINT: {SEARCH_ENDPOINT}')
-CHAT_ENDPOINT = os.environ['CHAT_ENDPOINT']
-logger.info(f'CHAT_ENDPOINT: {CHAT_ENDPOINT}')
-
-whisperer = ArchitectureWhisperer(
-    chatbot_adapter=ChatbotAdapter(CHAT_ENDPOINT),
-    search_adapter=SearchAdapter(SEARCH_ENDPOINT),
-)
-
-api = FastAPI()
-FastAPIInstrumentor.instrument_app(api, excluded_urls="healthz/")
-
-
 @api.middleware("otel")
 async def init_otel_span(request: Request, call_next):
     if request.url.path == '/healthz/':
         return await call_next(request)
 
-    with tracer.start_as_current_span('root', kind=trace.SpanKind.SERVER) as span:
+    context = context_from_headers(request.headers)
+    with tracer.start_as_current_span('root', context=context, kind=trace.SpanKind.SERVER) as span:
         span.set_attribute('service.name', 'front')
         span.set_attribute('http.method', request.method)
         span.set_attribute('http.url', str(request.url))

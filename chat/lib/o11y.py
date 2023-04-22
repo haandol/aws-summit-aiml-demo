@@ -27,8 +27,8 @@ propagate.set_global_textmap(AwsXRayPropagator())
 
 RequestsInstrumentor().instrument()
 
-tracer = trace.get_tracer('front')
+tracer = trace.get_tracer('chatbot')
 
 
 def context_from_headers(headers):
-    return propagate.get_global_textmap().extract(headers) or None
+    return propagate.get_global_textmap().extract(headers)
