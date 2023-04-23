@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 nvidia/cuda:12.1.0-devel-ubuntu20.04
+FROM --platform=linux/amd64 nvidia/cuda:12.1.0-runtime-ubuntu20.04
 LABEL maintainer="ldg55d@gmail.com"
 
 ARG DEBIAN_FRONTEND=noninteractive
