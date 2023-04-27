@@ -65,7 +65,7 @@ export class EcsClusterStack extends Stack {
     const launchTemplate = new ec2.LaunchTemplate(this, 'GpuLaunchTemplate', {
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.P3,
-        ec2.InstanceSize.XLARGE8
+        ec2.InstanceSize.XLARGE16
       ),
       blockDevices: [
         {
