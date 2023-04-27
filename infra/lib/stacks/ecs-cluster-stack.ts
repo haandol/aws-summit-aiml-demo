@@ -278,9 +278,9 @@ export class EcsClusterStack extends Stack {
 
     const cpuAsg = new autoscaling.AutoScalingGroup(this, 'CpuAsg', {
       vpc: cluster.vpc,
-      minCapacity: 2,
-      desiredCapacity: 2,
-      maxCapacity: 2,
+      minCapacity: 3,
+      desiredCapacity: 3,
+      maxCapacity: 3,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },

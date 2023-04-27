@@ -97,7 +97,9 @@ def chat(message: Message):
                 user_input=message.prompt,
                 context=message.context,
             )
-            span.set_attribute('response', response)
+            span.set_attribute('kind', response['kind'])
+            span.set_attribute('keyword', response['keyword'])
+            span.set_attribute('generation', response['generation'])
             return JSONResponse(content={
                 'status': 'ok',
                 'type': response['kind'],
