@@ -68,7 +68,6 @@ async def init_otel_span(request: Request, call_next):
         span.set_attribute('http.method', request.method)
         span.set_attribute('http.url', str(request.url))
         span.set_attribute('http.user_agent', request.headers.get('User-Agent') or '')
-        span.set_attribute('http.client_ip', request.headers.get('X-Forwarded-For') or '')
 
         response: Response = await call_next(request)
         span.set_attribute('http.status', response.status_code)
@@ -81,14 +80,14 @@ async def init_otel_span(request: Request, call_next):
 
 
 @api.on_event('startup')
-async def startup_event():
+def startup_event():
     t = BackgroundModelLoader()
     t.start()
 
 
 @api.get('/healthz')
 @api.get('/healthz/')
-async def healthz():
+def healthz():
     return {
         'status': 'ok',
     }
@@ -96,7 +95,7 @@ async def healthz():
 
 @api.get('/readyz')
 @api.get('/readyz/')
-async def readyz():
+def readyz():
     return {
         'status': is_ready,
     }
@@ -104,7 +103,7 @@ async def readyz():
 
 @api.post('/v1/chat')
 @api.post('/v1/chat/')
-async def chat(message: Message):
+def chat(message: Message):
     with tracer.start_as_current_span('chat') as span:
         logger.info(f'user_input: {message.json()}')
         span.set_attribute('message', message.json())

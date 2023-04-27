@@ -73,12 +73,17 @@ class ArchitectureWhisperer(object):
         self.chat_generator = ChatGenerator(chatbot_adapter)
 
     def orchestrate(self, user_input: str, context: str = ''):
+        kind = 'chat'
+        keyword = ''
         with tracer.start_as_current_span('orchestrate') as span:
             span.set_attribute('type', 'chat')
 
             if not user_input:
                 span.set_attribute('no_input', True)
-                return 'chat', 'You must input something.'
+                return {
+                    'kind': kind,
+                    'generation': 'You must input something.',
+                }
 
             logger.info(f'user_input: {user_input}')
             span.set_attribute('user_input', user_input)
@@ -93,12 +98,16 @@ class ArchitectureWhisperer(object):
                 span.set_attribute('category', category)
 
                 if category != CATEGORY_UNKNOWN:
-                    query = category.lower().replace('.', '')
+                    kind = 'search'
+                    keyword = category.lower().replace('.', '')
                     span.set_attribute('type', 'search')
-                    span.set_attribute('query', query)
-                    return 'search', query
+                    span.set_attribute('keyword', keyword)
 
             generation = self.chat_generator.generate(user_input=user_input, context=context)
             logger.info(f'generation: {generation}')
             span.set_attribute('chat generation', generation)
-            return 'chat', generation
+            return {
+                'kind': kind,
+                'keyword': keyword,
+                'generation': generation
+            }
