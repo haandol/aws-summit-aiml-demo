@@ -65,7 +65,7 @@ export class FrontService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 8,
+      desiredCount: 6,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {
@@ -80,8 +80,8 @@ export class FrontService extends Construct {
     });
 
     const scalableTarget = service.autoScaleTaskCount({
-      minCapacity: 8,
-      maxCapacity: 12,
+      minCapacity: 6,
+      maxCapacity: 9,
     });
     scalableTarget.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 70,
