@@ -102,7 +102,7 @@ export class ChatbotService extends Construct {
       cluster: props.cluster,
       circuitBreaker: { rollback: true },
       taskDefinition,
-      desiredCount: 8,
+      desiredCount: 32,
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
       cloudMapOptions: {

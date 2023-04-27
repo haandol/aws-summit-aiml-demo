@@ -30,6 +30,11 @@ export class ChatbotServiceStack extends Stack {
           stringValue: `http://otel.chatbotdemodev:4317`,
         })
       ),
+      LOAD_IN_8BIT: ecs.Secret.fromSsmParameter(
+        new ssm.StringParameter(this, 'EnvLoadIn8bit', {
+          stringValue: `true`,
+        })
+      ),
     };
 
     new ChatbotService(this, 'ChatbotService', {
