@@ -262,8 +262,8 @@ export class EcsClusterStack extends Stack {
   ) {
     const gpuAsg = new autoscaling.AutoScalingGroup(this, 'GpuAsg', {
       vpc: cluster.vpc,
-      minCapacity: 1,
-      desiredCapacity: 1,
+      minCapacity: 2,
+      desiredCapacity: 2,
       maxCapacity: 2,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
