@@ -93,15 +93,16 @@ def chat(message: Message):
             }, headers={'X-Error': str(exc)})
 
         try:
-            kind, generation = whisperer.orchestrate(
+            response = whisperer.orchestrate(
                 user_input=message.prompt,
                 context=message.context,
             )
-            span.set_attribute('generation', generation)
+            span.set_attribute('response', response)
             return JSONResponse(content={
                 'status': 'ok',
-                'type': kind,
-                'generation': generation,
+                'type': response['kind'],
+                'keyword': response['keyword'],
+                'generation': response['generation'],
             })
         except Exception as exc:
             logger.exception(traceback.format_exc())
