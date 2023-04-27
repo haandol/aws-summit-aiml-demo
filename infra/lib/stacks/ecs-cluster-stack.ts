@@ -64,8 +64,8 @@ export class EcsClusterStack extends Stack {
     );
     const launchTemplate = new ec2.LaunchTemplate(this, 'GpuLaunchTemplate', {
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.G4DN,
-        ec2.InstanceSize.XLARGE2
+        ec2.InstanceClass.P3,
+        ec2.InstanceSize.XLARGE8
       ),
       blockDevices: [
         {
@@ -262,9 +262,9 @@ export class EcsClusterStack extends Stack {
   ) {
     const gpuAsg = new autoscaling.AutoScalingGroup(this, 'GpuAsg', {
       vpc: cluster.vpc,
-      minCapacity: 32,
-      desiredCapacity: 32,
-      maxCapacity: 32,
+      minCapacity: 2,
+      desiredCapacity: 2,
+      maxCapacity: 2,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
@@ -278,9 +278,9 @@ export class EcsClusterStack extends Stack {
 
     const cpuAsg = new autoscaling.AutoScalingGroup(this, 'CpuAsg', {
       vpc: cluster.vpc,
-      minCapacity: 3,
-      desiredCapacity: 3,
-      maxCapacity: 3,
+      minCapacity: 2,
+      desiredCapacity: 2,
+      maxCapacity: 2,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
