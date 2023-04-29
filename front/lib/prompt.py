@@ -5,21 +5,28 @@ Below is an instruction that describes a task, paired with an input that provide
 Classify the following sentence into 'question', or 'statement'.
 
 ### Input:
+Sentence: How are you doign today?
+Class: question.
+
 Sentence: I would like to build personalized sports observer system, but what should I do?
-Answer: question.
+Class: question.
+
+Sentence: I am happy for you.
+Class: statement.
 
 Sentence: I want to create a online shop for selling cell-phones.
-Answer: statement.
+Class: statement.
 
+### Response:
 Sentence: {user_input}
-Answer:
+Class:
 '''.strip()
 
 CATEGORY_PROMPT = '''
 Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
 ### Instruction:
-Please label the category towards the sentence.
+Label the category towards the sentence.
 Use 'Unknown' for all unknown categories.
 Use the following list as only available Category. Do not make up new category other than the list.
 {categories}
@@ -28,9 +35,13 @@ Use the following list as only available Category. Do not make up new category o
 Sentence: What is the easiest way to build an application on Amazon Web Services (AWS)?
 Category: Unknown.
 
+Sentence: Can you give me an advice for build a healthcare mobile application?
+Category: Health.
+
 Sentence: I want to optimize the delivery system for big super-markets, but what should I do?
 Category: Retail.
 
+### Response:
 Sentence: {user_input}
 Category:
 '''.strip()
@@ -47,13 +58,18 @@ The human statements start with [|Human|] and the assistant statements start wit
 Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted cloud, offering over 200 fully featured services from data centers globally. Millions of customers—including the fastest-growing startups, largest enterprises, and leading government agencies—are using AWS to lower costs, become more agile, and innovate faster.
 
 ### Input:
+[|Human|]: Hi, What is your name?
 [|SA|]: Hi, I am ArchitectureWhisperer. Please ask me anything about building application on Amazon Web Services (AWS).
+
+[|Human|]: Could you list AWS Services related to AI/ML?
+[|SA|]: Sure, Here are the services about Machine Learning (ML) and Artificial Intelligence (AI) on AWS. Amazon Augmented AI, Amazon CodeWhisperer, Amazon Comprehend, Amazon Forecast, Amazon Fraud Detector, Amazon Lex, Amazon Personalize, Amazon Polly, Amazon Rekognition, Amazon SageMaker, Amazon Textract, Amazon Transcribe, Amazon Translate.
 
 [|Human|]: Could you list AWS Services related to AI/ML?
 [|SA|]: Sure, Here are the services about Machine Learning (ML) and Artificial Intelligence (AI) on AWS. Amazon Augmented AI, Amazon CodeWhisperer, Amazon Comprehend, Amazon Forecast, Amazon Fraud Detector, Amazon Lex, Amazon Personalize, Amazon Polly, Amazon Rekognition, Amazon SageMaker, Amazon Textract, Amazon Transcribe, Amazon Translate.
 
 {context}
 
+### Response:
 [|Human|]: {user_input}
 [|SA|]:
 '''.strip()
