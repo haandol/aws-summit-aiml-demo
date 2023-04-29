@@ -12,6 +12,7 @@ class QuestionClassifier(object):
         prompt = PROMPT['question'].format(user_input=user_input)
         generation = self.adapter.generate(
             prompt=prompt,
+            temperature=0,
             max_new_tokens=32,
         )
         logger.info(f'classify generation: {generation}')
@@ -26,6 +27,7 @@ class CategoryClassifier(object):
         prompt = PROMPT['category'].format(user_input=user_input, categories=CATEGORIES)
         generation = self.adapter.generate(
             prompt=prompt,
+            temperature=0,
             max_new_tokens=32,
         )
         category = generation.strip().replace('.', '')
@@ -55,9 +57,9 @@ class ChatGenerator(object):
             prompt=prompt,
             top_k=50,
             top_p=0.92,
-            max_new_tokens=256,
-            temperature=0.4,
+            temperature=0.7,
             do_sample=True,
+            max_new_tokens=256,
         )
         refined = self.refine(generation)
         logger.info(f'chat generation and refined: {generation} => {refined}')
