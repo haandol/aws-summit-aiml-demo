@@ -21,7 +21,9 @@ class QuestionClassifier(object):
 
 class CategoryClassifier(object):
     def __init__(self, adapter: ChatbotAdapter) -> None:
-        self.categories = map(lambda x: x.replace('- ', '').lower(), CATEGORIES.split())
+        self.categories = list(
+            map(lambda x: x.replace('- ', '').lower(), CATEGORIES.split('\n'))
+        )
         self.adapter = adapter
 
     def classify( self, user_input: str) -> str:
@@ -30,9 +32,10 @@ class CategoryClassifier(object):
             prompt=prompt,
             temperature=0,
             max_new_tokens=32,
-        )
+        ).lower().strip()
+
         for cate in self.categories:
-            if cate in generation.lower():
+            if cate in generation:
                 logger.info(f'found category: {generation} => {cate}')
                 return cate
 
