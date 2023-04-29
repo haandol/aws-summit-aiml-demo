@@ -33,7 +33,7 @@ class CategoryClassifier(object):
         )
         for cate in self.categories:
             if cate in generation.lower():
-                logger.infow(f'found category: {generation} => {cate}')
+                logger.info(f'found category: {generation} => {cate}')
                 return cate
 
         logger.warning(f'!! not found category for generation: {generation}')
