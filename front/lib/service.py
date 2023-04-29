@@ -21,6 +21,7 @@ class QuestionClassifier(object):
 
 class CategoryClassifier(object):
     def __init__(self, adapter: ChatbotAdapter) -> None:
+        self.categories = map(lambda x: x.replace('- ', '').lower(), CATEGORIES.split())
         self.adapter = adapter
 
     def classify( self, user_input: str) -> str:
@@ -30,14 +31,13 @@ class CategoryClassifier(object):
             temperature=0,
             max_new_tokens=32,
         )
-        category = generation.strip().replace('.', '')
-        logger.info(f'biz generation and category: {generation} => {category}')
+        for cate in self.categories:
+            if cate in generation.lower():
+                logger.infow(f'found category: {generation} => {cate}')
+                return cate
 
-        if category and category in CATEGORIES:
-            return category
-        else:
-            logger.warning(f'not found category: {category}')
-            return CATEGORY_UNKNOWN
+        logger.warning(f'!! not found category for generation: {generation}')
+        return CATEGORY_UNKNOWN
 
 
 class ChatGenerator(object):

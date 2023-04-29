@@ -76,7 +76,6 @@ Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted 
 
 CATEGORY_UNKNOWN = 'Unknown'
 CATEGORIES = '\n'.join([
-    '- {CATEGORY_UNKNOWN}',
     # Industry Category
     '- Advertising and Marketing',
     '- Automotive',
@@ -114,6 +113,8 @@ CATEGORIES = '\n'.join([
     '- Robotics',
     '- Satellite',
     '- Security and Compliance',
+    # Unknown Category
+    '- {CATEGORY_UNKNOWN}',
 ])
 
 PROMPT = {
