@@ -58,9 +58,9 @@ class ChatGenerator(object):
         prompt = PROMPT['chat'].format(user_input=user_input, context=context)
         generation = self.adapter.generate(
             prompt=prompt,
-            top_k=50,
-            top_p=0.92,
-            temperature=0.7,
+            top_k=40,
+            top_p=0.75,
+            temperature=0.4,
             do_sample=True,
             max_new_tokens=256,
         )
