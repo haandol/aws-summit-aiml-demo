@@ -59,7 +59,7 @@ class ChatGenerator(object):
         generation = self.adapter.generate(
             prompt=prompt,
             top_k=40,
-            top_p=0.75,
+            top_p=0.95,
             temperature=0.4,
             do_sample=True,
             max_new_tokens=256,
