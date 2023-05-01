@@ -17,6 +17,7 @@ class ChatbotAdapter(object):
         top_p: float = 1.0,
         max_new_tokens: int = 32,
         temperature: float = 0.5,
+        num_return_sequences: int = 1,
         do_sample: bool = False,
     ) -> str:
         with tracer.start_as_current_span('chatbot adapter') as span:
@@ -26,6 +27,7 @@ class ChatbotAdapter(object):
                 'top_p': top_p,
                 'max_new_tokens': max_new_tokens,
                 'temperature': temperature,
+                'num_return_sequences': num_return_sequences,
                 'do_sample': do_sample,
             }
             span.set_attribute('body', json.dumps(body))
