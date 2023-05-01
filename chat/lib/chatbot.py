@@ -1,4 +1,5 @@
 import torch
+from random import choice
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from lib.logger import logger
 
@@ -42,6 +43,7 @@ def generate(
     top_p: float = 1.0,
     max_new_tokens: int = 32,
     temperature: float = 0.5,
+    num_return_sequences: int = 1,
     do_sample: bool = False,
 ):
     input_ids = tokenizer.encode(prompt, return_tensors='pt').to(model.device)
@@ -54,10 +56,11 @@ def generate(
             temperature=temperature,
             do_sample=do_sample,
             pad_token_id=tokenizer.eos_token_id,
-            num_return_sequences=1,
+            num_return_sequences=num_return_sequences,
             no_repeat_ngram_size=6,
         )
-    return tokenizer.decode(gen_tokens[0], skip_special_tokens=True)[len(prompt):]
+    gen_token = choice(gen_tokens)
+    return tokenizer.decode(gen_token, skip_special_tokens=True)[len(prompt):]
 
 
 if __name__ == '__main__':

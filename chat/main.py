@@ -52,6 +52,9 @@ class Message(BaseModel):
     temperature: float = Field(
         default=0.5, title='temperature',
     )
+    num_return_sequences: int = Field(
+        default=1, title='num_return_sequences',
+    )
     do_sample: bool = Field(
         default=False, title='do_sample',
     )
@@ -127,6 +130,7 @@ def chat(message: Message):
                 top_p=message.top_p,
                 max_new_tokens=message.max_new_tokens,
                 temperature=message.temperature,
+                num_return_sequences=message.num_return_sequences,
                 do_sample=message.do_sample,
             )
             span.set_attribute('generation', generation)
