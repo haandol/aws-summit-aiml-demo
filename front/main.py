@@ -72,7 +72,9 @@ def chat(message: Message):
         logger.info(f'user_input: {message.json()}')
         span.set_attribute('message', message.json())
 
-        if not message.prompt:
+        user_input = message.prompt.strip()
+
+        if not user_input:
             exc = Exception('Sorry, You must input something.')
             span.record_exception(exc)
             span.set_status(trace.Status(trace.StatusCode.ERROR))
@@ -82,7 +84,7 @@ def chat(message: Message):
                 'generation': str(exc),
             }, headers={'X-Error': str(exc)})
 
-        if len(message.prompt) > 180:
+        if len(user_input) > 180:
             exc = Exception('Sorry, Your input is too long. > 180 characters.')
             span.record_exception(exc)
             span.set_status(trace.Status(trace.StatusCode.ERROR))
@@ -94,8 +96,8 @@ def chat(message: Message):
 
         try:
             response = whisperer.orchestrate(
-                user_input=message.prompt,
-                context=message.context,
+                user_input=user_input,
+                context=message.context.strip(),
             )
             span.set_attribute('kind', response['kind'])
             span.set_attribute('keyword', response['keyword'])
