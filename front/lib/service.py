@@ -62,8 +62,8 @@ class ChatGenerator(object):
             top_p=0.95,
             temperature=0.7,
             do_sample=True,
-            max_new_tokens=640,
-            num_return_sequences=3,
+            max_new_tokens=512,
+            num_return_sequences=1,
         )
         refined = self.refine(generation)
         logger.info(f'chat generation and refined: {generation} => {refined}')
