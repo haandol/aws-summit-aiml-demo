@@ -58,6 +58,9 @@ class Message(BaseModel):
     do_sample: bool = Field(
         default=False, title='do_sample',
     )
+    eos_token_id: int = Field(
+        default=2, title='eos_token_id', description='End of sentence token id, default is <\\s>'
+    )
 
 
 @api.middleware("otel")
@@ -132,6 +135,7 @@ def chat(message: Message):
                 temperature=message.temperature,
                 num_return_sequences=message.num_return_sequences,
                 do_sample=message.do_sample,
+                eos_token_id=message.eos_token_id,
             )
             span.set_attribute('generation', generation)
             return JSONResponse(content={

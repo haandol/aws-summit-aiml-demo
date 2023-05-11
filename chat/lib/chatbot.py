@@ -45,6 +45,7 @@ def generate(
     temperature: float = 0.5,
     num_return_sequences: int = 1,
     do_sample: bool = False,
+    eos_token_id: int = 2,
 ):
     input_ids = tokenizer.encode(prompt, return_tensors='pt').to(model.device)
     with torch.no_grad():
@@ -55,8 +56,9 @@ def generate(
             max_new_tokens=max_new_tokens, 
             temperature=temperature,
             do_sample=do_sample,
-            pad_token_id=tokenizer.eos_token_id,
             num_return_sequences=num_return_sequences,
+            eos_token_id=eos_token_id,
+            pad_token_id=tokenizer.eos_token_id,
             no_repeat_ngram_size=6,
         )
     gen_token = choice(gen_tokens)

@@ -14,6 +14,7 @@ class QuestionClassifier(object):
             prompt=prompt,
             temperature=0,
             max_new_tokens=32,
+            eos_token_id=29889, # '.' token
         )
         logger.info(f'classify generation: {generation}')
         return 'question' in generation.lower()
@@ -32,6 +33,7 @@ class CategoryClassifier(object):
             prompt=prompt,
             temperature=0,
             max_new_tokens=32,
+            eos_token_id=29889, # '.' token
         ).lower().strip()
 
         for cate in self.categories:
@@ -63,6 +65,7 @@ class ChatGenerator(object):
             temperature=0.7,
             do_sample=True,
             max_new_tokens=320,
+            eos_token_id=2, # default is 2, '<\s>' token
             num_return_sequences=1,
         )
         refined = self.refine(generation)
